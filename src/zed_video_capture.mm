@@ -17,10 +17,10 @@ namespace zed {
         ZEDVideoCapture *wrapped;
     };
 
-    VideoCapture::VideoCapture(VideoCaptureFormat videoCaptureFormat)
+    VideoCapture::VideoCapture()
     {
         impl = new VideoCaptureImpl();
-        impl->wrapped = [[ZEDVideoCapture alloc] initWithVideoCaptureFormat:videoCaptureFormat];
+        impl->wrapped = [[ZEDVideoCapture alloc] init];
 
         if (!impl->wrapped) {
             throw std::runtime_error("Failed to create ZEDVideoCapture object");
@@ -33,6 +33,17 @@ namespace zed {
             delete impl;
         }
     }
+
+    void VideoCapture::open(VideoCaptureFormat videoCaptureFormat)
+    {
+        BOOL success = [impl->wrapped openWithVideoCaptureFormat:videoCaptureFormat];
+
+        if (!success) {
+            throw std::runtime_error("Failed to open ZEDVideoCapture stream");
+        }
+    }
+
+    void VideoCapture::close() { [impl->wrapped close]; }
 
     void VideoCapture::start(function<void(uint8_t *, size_t, size_t, size_t)> frameProcessor)
     {

@@ -14,10 +14,7 @@ using namespace std;
 
 namespace zed {
 
-    enum VideoCaptureFormat {
-        BGRA = 0,
-        YUV = 1
-    };
+    enum VideoCaptureFormat { YUV = 0, GREYSCALE = 1, RGB = 2 };
 
     struct VideoCaptureImpl;
 
@@ -25,8 +22,11 @@ namespace zed {
         VideoCaptureImpl *impl;
 
       public:
-        VideoCapture(VideoCaptureFormat);
+        VideoCapture();
         ~VideoCapture();
+
+        void open(VideoCaptureFormat videoCaptureFormat);
+        void close();
 
         void start(function<void(uint8_t *, size_t, size_t, size_t)> frameProcessor);
         void stop();

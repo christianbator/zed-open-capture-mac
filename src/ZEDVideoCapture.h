@@ -9,7 +9,8 @@
 
 @interface ZEDVideoCapture : NSObject
 
-- (_Nullable instancetype)initWithVideoCaptureFormat:(int)videoCaptureFormat;
+- (BOOL)openWithVideoCaptureFormat:(int)videoCaptureFormat;
+- (void)close;
 
 - (void)start:(void (^_Nonnull)(uint8_t *_Nonnull, size_t, size_t, size_t))frameProcessingBlock;
 - (void)stop;

@@ -1,0 +1,9 @@
+#
+# .gitignore
+# zed-open-capture-mac
+#
+# Created by Christian Bator on 01/13/2025
+#
+
+build
+.cache
