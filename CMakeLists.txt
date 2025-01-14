@@ -10,25 +10,26 @@ cmake_minimum_required(VERSION 3.31)
 #
 # Project Info
 #
-set(PROJECT_NAME "zed-open-capture-mac")
+set(PROJECT_NAME "ZEDOpenCaptureMac")
 project(${PROJECT_NAME} LANGUAGES CXX OBJC)
 
 #
 # Compiler
 #
-find_program(CLANG_PATH NAMES clang++ PATHS /opt/homebrew/opt/llvm/bin)
-set(CMAKE_CXX_COMPILER ${CLANG_PATH})
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
-
-#
-# Build Type
-#
-set(CMAKE_BUILD_TYPE Debug)
 
 #
 # Source
 #
+set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
+
+file(GLOB_RECURSE HEADERS
+    "${INCLUDE_DIR}/*.h"
+    "${INCLUDE_DIR}/*.hpp"
+)
+
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 
 file(GLOB_RECURSE SOURCES
@@ -37,31 +38,29 @@ file(GLOB_RECURSE SOURCES
     "${SRC_DIR}/*.mm"
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+# add_executable(${PROJECT_NAME} ${SOURCES})
+
+add_library(${PROJECT_NAME} SHARED
+    ${SOURCES}
+)
 
 #
 # Dependencies
 #
-find_library(FOUNDATION_FRAMEWORK Foundation)
-find_library(AVFOUNDATION_FRAMEWORK AVFoundation)
-find_library(COREMEDIA_FRAMEWORK CoreMedia)
-find_library(COREVIDEO_FRAMEWORK CoreVideo)
-find_library(COREGRAPHICS_FRAMEWORK CoreGraphics)
-find_library(ACCELERATE_FRAMEWORK Accelerate)
-find_package(OpenCV REQUIRED)
-
-target_include_directories(${PROJECT_NAME}
-    PRIVATE
-    ${OpenCV_INCLUDE_DIRS}
-)
-
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-    ${FOUNDATION_FRAMEWORK}
-    ${AVFOUNDATION_FRAMEWORK}
-    ${COREMEDIA_FRAMEWORK}
-    ${COREVIDEO_FRAMEWORK}
-    ${COREGRAPHICS_FRAMEWORK}
-    ${ACCELERATE_FRAMEWORK}
-    ${OpenCV_LIBS}
+    PUBLIC
+    "-framework Foundation"
+    "-framework AVFoundation"
+    "-framework CoreMedia"
+    "-framework CoreVideo"
+    "-framework CoreGraphics"
+    "-framework Accelerate"
 )
+
+#
+# Install
+#
+set(CMAKE_INSTALL_PREFIX "/opt/stereolabs")
+
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+install(FILES ${HEADERS} DESTINATION include)

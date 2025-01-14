@@ -1,18 +1,25 @@
 //
-// main.cpp
+// opencv_video_stream.cpp
 // zed-open-capture-mac
 //
-// Created by Christian Bator on 01/10/2025
+// Created by Christian Bator on 01/13/2025
 //
 
-#include "../include/zed_video_capture.hpp"
+#include <format>
+#include "zed_video_capture.hpp"
 #include <opencv2/opencv.hpp>
 
 using namespace std;
 using namespace zed;
 
-void showYUVVideo(string windowName)
+//
+// YUV
+//
+void showYUVVideo()
 {
+    string windowName = "ZED";
+    cv::namedWindow(windowName);
+
     size_t height = 720;
     size_t width = 2560;
 
@@ -35,8 +42,14 @@ void showYUVVideo(string windowName)
     }
 }
 
-void showGreyscaleVideo(string windowName)
+//
+// Greyscale
+//
+void showGreyscaleVideo()
 {
+    string windowName = "ZED";
+    cv::namedWindow(windowName);
+
     size_t height = 720;
     size_t width = 2560;
 
@@ -55,8 +68,14 @@ void showGreyscaleVideo(string windowName)
     }
 }
 
-void showRGBVideo(string windowName)
+//
+// RGB
+//
+void showRGBVideo()
 {
+    string windowName = "ZED";
+    cv::namedWindow(windowName);
+
     size_t height = 720;
     size_t width = 2560;
 
@@ -79,19 +98,39 @@ void showRGBVideo(string windowName)
     }
 }
 
+//
+// Usage
+//
+int usageError(string error) {
+    cerr << "> Error: " << error << endl;
+    cerr << "> Usage: opencv_video_stream (yuv | greyscale | rgb)" << endl;
+
+    return 2;
+}
+
+//
+// Main
+//
 int main(int argc, const char *argv[])
 {
-    string windowName = "ZED";
-    cv::namedWindow(windowName);
+    if (argc != 2) {
+        return usageError("Too few arguments");
+    }
 
-    // YUV example
-    showYUVVideo(windowName);
-
-    // Greyscale example
-    // showGreyscaleVideo(windowName);
-
-    // RGB example
-    // showRGBVideo(windowName);
-
+    string formatArgument = argv[1];
+    
+    if (formatArgument == "yuv") {
+        showYUVVideo();
+    }
+    else if (formatArgument == "greyscale") {
+        showGreyscaleVideo();
+    }
+    else if (formatArgument == "rgb") {
+        showRGBVideo();
+    }
+    else {
+        return usageError(format("Invalid format '{}'", formatArgument));
+    }
+    
     return 0;
 }
