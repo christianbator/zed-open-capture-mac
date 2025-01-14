@@ -145,7 +145,7 @@ TODO...
 
 #### Coordinate system
 
-The given IMU and magnetometer data are expressed in the coordinate system as shown below
+The given IMU and magnetometer data are expressed in the coordinate system shown below:
 
 ![](./images/imu-axis.jpg)
 
@@ -168,7 +168,8 @@ cmake --build build
 ```
 
 The following examples are built:
-- `opencv_video_stream`, Usage: `./opencv_video_stream (yuv | greyscale | rgb)`
+- opencv_video_stream
+  - Usage: `./opencv_video_stream (yuv | greyscale | rgb)`
   - Displays the connected ZED camera feed with OpenCV with the desired colorspace 
 
 ## Documentation
