@@ -170,7 +170,7 @@ cmake --build build
 The following examples are built:
 - opencv_video_stream
   - Usage: `./opencv_video_stream (yuv | greyscale | rgb)`
-  - Displays the connected ZED camera feed with OpenCV with the desired colorspace 
+  - Displays the connected ZED camera feed in the desired colorspace with OpenCV
 
 ## Documentation
 
