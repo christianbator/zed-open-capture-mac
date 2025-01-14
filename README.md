@@ -179,5 +179,4 @@ TODO...
 ## Related
 
 - [Stereolabs](https://www.stereolabs.com)
-- [ZED 2i multi-sensor camera](https://www.stereolabs.com/zed-2i/)
 - [ZED SDK](https://www.stereolabs.com/developers/)
