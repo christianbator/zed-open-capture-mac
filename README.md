@@ -9,8 +9,8 @@
   <a href="#features">Features</a> •
   <a href="#install">Install</a> •
   <a href="#run">Run</a> • 
-  <a href="#documentation">Documentation</a> •
   <a href="#examples">Examples</a> •
+  <a href="#documentation">Documentation</a> •
   <a href="#related">Related</a> •
 </p>
 <br>
@@ -38,10 +38,10 @@ The open-source library provides methods to access raw video frames, calibration
 ### Prerequisites
 
  * Stereolabs USB3 Stereo camera: [ZED 2i](https://www.stereolabs.com/zed-2i/), [ZED 2](https://www.stereolabs.com/zed-2/), [ZED Mini](https://www.stereolabs.com/zed-mini/)
- * macOS (>= 15.1.1)
- * Clang (>= 19.1.5) (Xcode or Homebrew)
- * CMake (>= 3.31.2)
- * OpenCV (>= 4.10.0) (Optional: for examples) 
+ * macOS (>= 15)
+ * Clang (>= 19) (Xcode or Homebrew)
+ * CMake (>= 3.31)
+ * OpenCV (>= 4.10) (Optional: for examples) 
 
 ### Install prerequisites
 
@@ -101,9 +101,9 @@ sudo rm -r /opt/stereolabs
 
 ### Video capture
 
-Include the `videocapture.hpp` header, declare a `VideoCapture` object, and retrieve a stream of video frames with `start()`:
-
+Starting the capture:
 ```C++
+// Include the header
 #include "zed_video_capture.hpp"
 
 // Create a video capture instance
@@ -115,17 +115,22 @@ videoCapture.open(RGB);
 // Start the capture, passing a closure or function that's invoked for each frame
 videoCapture.start([](uint8_t *data, size_t height, size_t width, size_t channels) {
     //
-    // `data` is an interleaved pixel buffer in the specified colorspace (height * width * channels) bytes long
+    // `data` is an interleaved pixel buffer in the specified colorspace
+    // `data` is (height * width * channels) bytes long
     //  
     // Process `data` here
     //
 });
 
 // Keep the process alive while processing frames
-// OpenCV example:
 while (true) {
+    // For example, with OpenCV:
     cv::waitKey(1);
 }
+```
+
+Stopping the capture:
+```c++
 
 // Stop the capture at any point
 videoCapture.stop();
@@ -143,11 +148,6 @@ TODO...
 The given IMU and magnetometer data are expressed in the coordinate system as shown below
 
 ![](./images/imu-axis.jpg)
-
-
-## Documentation
-
-TODO...
 
 ## Examples
 
@@ -169,7 +169,11 @@ cmake --build build
 
 The following examples are built:
 - `opencv_video_stream`, Usage: `./opencv_video_stream (yuv | greyscale | rgb)`
-  - Displays the connected ZED camera feed with OpenCV with the desired color space 
+  - Displays the connected ZED camera feed with OpenCV with the desired colorspace 
+
+## Documentation
+
+TODO...
 
 ## Related
 
