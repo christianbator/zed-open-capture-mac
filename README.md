@@ -18,20 +18,44 @@
 ## Features
 
 - Open source C++20 capture library
-- Video data
-    - YUV 4:2:2
-    - Greyscale
-    - RGB
-- Sensor data
-    - TODO
+- Video data capture
+    - [x] YUV 4:2:2 (native camera format)
+    - [x] Greyscale (hardware-accelerated conversion)
+    - [x] RGB (hardware-accelerated conversion)
+- Resolution control
+    - [ ] HD2K: 2208 x 1242 (15 fps)
+    - [ ] HD1080: 1920 x 1080 (15, 30 fps)
+    - [ ] HD720: 1280 x 720 (15, 30, 60 fps)
+    - [ ] VGA: 672 x 376 (15, 30, 60, 100 fps)
+- Camera control
+    - [ ] LED on / off
+    - [ ] Brightness
+    - [ ] Sharpness
+    - [ ] Contrast
+    - [ ] Hue
+    - [ ] Saturation
+    - [ ] White balance
+    - [ ] Gamma
+    - [ ] Gain
+    - [ ] Exposure
+    - [ ] Auto white balance
+    - [ ] Auto exposure and gain
+    - [ ] Region of interest for auto exposure and gain
+- Sensor data capture
+    - [ ] 6-DOF IMU (3-DOF accelerometer & 3-DOF gyroscope)
+    - [ ] 3-DOF Magnetometer (ZED 2 & ZED 2i)
+    - [ ] Barometer (ZED 2 & ZED 2i)
+    - [ ] Temperature (ZED 2 & ZED 2i)
+- Synchronization
+    - [ ] Video and sensor data synchronization
 
 ### Description
 
 The ZED Open Capture library is a macOS library for low-level camera and sensor capture for the ZED stereo camera family.
 
-The open-source library provides methods to access raw video frames, calibration data, camera controls, and raw data from the USB3 camera sensors. A synchronization mechanism is provided to get the correct sensor data associated with a video frame.
+The library provides methods to access raw video frames, calibration data, camera controls, and raw data from the USB3 camera sensors. A synchronization mechanism is provided to associate the correct sensor data with a particular video frame.
 
-**Note:** While in the ZED SDK all output data is calibrated and compensated, here the extracted raw data is not corrected by the camera and sensor calibration parameters. You can retrieve camera and sensor calibration data using the [ZED SDK](https://www.stereolabs.com/docs/video/camera-calibration/) to correct your camera data [see `zed_open_capture_rectify_example` example](#running-the-examples).
+**Note:** While the ZED SDK calibrates and compensates all output data, here the extracted raw data is not corrected by the camera nor sensor calibration parameters. You can retrieve camera and sensor calibration data using the [ZED SDK](https://www.stereolabs.com/docs/video/camera-calibration/) to correct your camera data.
 
 ## Install
 
@@ -168,13 +192,15 @@ cmake --build build
 ```
 
 The following examples are built:
-- opencv_video_stream
-  - Usage: `./opencv_video_stream (yuv | greyscale | rgb)`
-  - Displays the connected ZED camera feed in the desired colorspace with OpenCV
+
+### opencv_video_stream
+
+- Usage: `./opencv_video_stream (yuv | greyscale | rgb)`
+- Displays the connected ZED camera feed in the desired colorspace with OpenCV
 
 ## Documentation
 
-TODO...
+To do ...
 
 ## Related
 
