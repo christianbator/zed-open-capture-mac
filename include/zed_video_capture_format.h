@@ -22,70 +22,82 @@ namespace zed {
     };
 
     enum FrameRate {
-        FPS_15 = 15,    // ~66 ms per frame
-        FPS_30 = 30,    // ~33 ms per frame
-        FPS_60 = 60,    // ~16 ms per frame
-        FPS_100 = 100   //  10 ms per frame   
+        FPS_15 = 15,  // ~66 ms per frame
+        FPS_30 = 30,  // ~33 ms per frame
+        FPS_60 = 60,  // ~16 ms per frame
+        FPS_100 = 100 //  10 ms per frame
     };
 
     enum ColorSpace {
-        YUV,        // YUV 4:2:2 in Y0, Cb, Y1, Cr order (8-bit) 
-        GREYSCALE,  // 1 channel                         (8-bit)
-        RGB,        // 3 channels                        (8-bit)
-        BGR         // 3 channels                        (8-bit)
+        YUV,       // YUV 4:2:2 in Y0, Cb, Y1, Cr order (8-bit)
+        GREYSCALE, // 1 channel                         (8-bit)
+        RGB,       // 3 channels                        (8-bit)
+        BGR        // 3 channels                        (8-bit)
     };
 
     struct StereoDimensions {
-        
+
         int width;
         int height;
 
-        StereoDimensions(Resolution resolution) {
+        StereoDimensions()
+        {
+            width = 0;
+            height = 0;
+        }
+
+        StereoDimensions(Resolution resolution)
+        {
             switch (resolution) {
-                case HD2K:
-                    width = 2208 * 2;
-                    height = 1242;
-                    break;
-                case HD1080:
-                    width = 1920 * 2;
-                    height = 1080;
-                    break;
-                case HD720:
-                    width = 1280 * 2;
-                    height = 720;
-                    break;
-                case VGA:
-                    width = 672 * 2;
-                    height = 376;
-                    break;
+            case HD2K:
+                width = 2208 * 2;
+                height = 1242;
+                break;
+            case HD1080:
+                width = 1920 * 2;
+                height = 1080;
+                break;
+            case HD720:
+                width = 1280 * 2;
+                height = 720;
+                break;
+            case VGA:
+                width = 672 * 2;
+                height = 376;
+                break;
             }
         }
 
-        constexpr
-        string toString() {
-            return format("{}x{}", width, height);
-        }
+        constexpr string toString() { return format("{} x {}", width, height); }
     };
 
-    constexpr
-    string resolutionToString(Resolution resolution) {
+    constexpr string resolutionToString(Resolution resolution)
+    {
         switch (resolution) {
-            case HD2K: return "HD2K";
-            case HD1080: return "HD1080";
-            case HD720: return "HD720";
-            case VGA: return "VGA";
+        case HD2K:
+            return "HD2K";
+        case HD1080:
+            return "HD1080";
+        case HD720:
+            return "HD720";
+        case VGA:
+            return "VGA";
         }
     }
 
-    constexpr
-    string colorSpaceToString(ColorSpace colorSpace) {
+    constexpr string colorSpaceToString(ColorSpace colorSpace)
+    {
         switch (colorSpace) {
-            case YUV: return "YUV";
-            case GREYSCALE: return "Greyscale";
-            case RGB: return "RGB";
-            case BGR: return "BGR";
+        case YUV:
+            return "YUV";
+        case GREYSCALE:
+            return "Greyscale";
+        case RGB:
+            return "RGB";
+        case BGR:
+            return "BGR";
         }
     }
-}
+} // namespace zed
 
 #endif

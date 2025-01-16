@@ -134,7 +134,7 @@ Starting the capture:
 // Create a video capture instance
 VideoCapture videoCapture;
 
-// Open the stream with a colorspace (YUV, GREYSCALE, RGB, or BGR)
+// Open the stream with a color space (YUV, GREYSCALE, RGB, or BGR)
 videoCapture.open(RGB); // Defaults to HD2K and 15 fps
 
 // Alternatively open the stream with a specified resolution and frame rate
@@ -144,7 +144,7 @@ videoCapture.open<HD720, FPS_60>(RGB);
 // Start the capture, passing a closure or function that's invoked for each frame
 videoCapture.start([](uint8_t *data, size_t height, size_t width, size_t channels) {
     //
-    // `data` is an interleaved pixel buffer in the specified colorspace
+    // `data` is an interleaved pixel buffer in the specified color space
     // `data` is (height * width * channels) bytes long
     //  
     // Process `data` here
@@ -201,7 +201,7 @@ The following examples are built:
 ### Example: opencv_video_stream
 
 - Usage: `./opencv_video_stream (yuv | greyscale | rgb | bgr)`
-- Displays the connected ZED camera feed in the desired colorspace with OpenCV
+- Displays the connected ZED camera feed in the desired color space with OpenCV
 
 ## Documentation
 

@@ -31,10 +31,10 @@ namespace zed {
     StereoDimensions VideoCapture::open(ColorSpace colorSpace) { return open(HD2K, FPS_15, colorSpace); }
 
     StereoDimensions VideoCapture::open(Resolution resolution, FrameRate frameRate, ColorSpace colorSpace)
-    {   
+    {
         StereoDimensions stereoDimensions = StereoDimensions(resolution);
 
-        bool result = [impl->wrapped openWithStereoDimensions:stereoDimensions frameRate:frameRate colorSpace:colorSpace];
+        bool result = [impl->wrapped openWithResolution:resolution frameRate:frameRate colorSpace:colorSpace];
 
         if (!result) {
             throw std::runtime_error("Failed to open ZEDVideoCapture stream");
