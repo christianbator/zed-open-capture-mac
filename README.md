@@ -22,11 +22,12 @@
     - [x] YUV 4:2:2 (native camera format)
     - [x] Greyscale (hardware-accelerated conversion)
     - [x] RGB (hardware-accelerated conversion)
+    - [x] BGR (hardware-accelerated conversion)
 - Resolution control
-    - [ ] HD2K: 2208 x 1242 (15 fps)
-    - [ ] HD1080: 1920 x 1080 (15, 30 fps)
-    - [ ] HD720: 1280 x 720 (15, 30, 60 fps)
-    - [ ] VGA: 672 x 376 (15, 30, 60, 100 fps)
+    - [x] HD2K: 2208 x 1242 (15 fps)
+    - [x] HD1080: 1920 x 1080 (15, 30 fps)
+    - [x] HD720: 1280 x 720 (15, 30, 60 fps)
+    - [x] VGA: 672 x 376 (15, 30, 60, 100 fps)
 - Camera control
     - [ ] LED on / off
     - [ ] Brightness
@@ -128,13 +129,17 @@ sudo rm -r /opt/stereolabs
 Starting the capture:
 ```C++
 // Include the header
-#include "zed_video_capture.hpp"
+#include "zed_video_capture.h"
 
 // Create a video capture instance
 VideoCapture videoCapture;
 
-// Open the stream with a colorspace (YUV, GREYSCALE, or RGB)
-videoCapture.open(RGB);
+// Open the stream with a colorspace (YUV, GREYSCALE, RGB, or BGR)
+videoCapture.open(RGB); // Defaults to HD2K and 15 fps
+
+// Alternatively open the stream with a specified resolution and frame rate
+// (see `zed_video_capture.h` for available resolutions, frame rates, and color spaces)
+videoCapture.open<HD720, FPS_60>(RGB);
 
 // Start the capture, passing a closure or function that's invoked for each frame
 videoCapture.start([](uint8_t *data, size_t height, size_t width, size_t channels) {
@@ -193,9 +198,9 @@ cmake --build build
 
 The following examples are built:
 
-### opencv_video_stream
+### Example: opencv_video_stream
 
-- Usage: `./opencv_video_stream (yuv | greyscale | rgb)`
+- Usage: `./opencv_video_stream (yuv | greyscale | rgb | bgr)`
 - Displays the connected ZED camera feed in the desired colorspace with OpenCV
 
 ## Documentation

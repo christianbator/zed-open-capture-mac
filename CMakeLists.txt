@@ -23,22 +23,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 #
 # Source
 #
-set(INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 
 file(GLOB_RECURSE HEADERS
-    "${INCLUDE_DIR}/*.h"
-    "${INCLUDE_DIR}/*.hpp"
+    ${INCLUDE_DIR}/*.h
 )
 
-set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
+set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 
-file(GLOB_RECURSE SOURCES
-    "${SRC_DIR}/*.cpp"
-    "${SRC_DIR}/*.m"
-    "${SRC_DIR}/*.mm"
+file(GLOB SOURCES
+    ${SRC_DIR}/*.cpp
+    ${SRC_DIR}/*.m
+    ${SRC_DIR}/*.mm
 )
-
-# add_executable(${PROJECT_NAME} ${SOURCES})
 
 add_library(${PROJECT_NAME} SHARED
     ${SOURCES}
@@ -60,7 +57,7 @@ target_link_libraries(${PROJECT_NAME}
 #
 # Install
 #
-set(CMAKE_INSTALL_PREFIX "/opt/stereolabs")
+set(CMAKE_INSTALL_PREFIX /opt/stereolabs)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 install(FILES ${HEADERS} DESTINATION include)

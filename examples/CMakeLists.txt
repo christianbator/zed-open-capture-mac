@@ -21,15 +21,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 #
-# Build Type
-#
-set(CMAKE_BUILD_TYPE Debug)
-
-#
 # Source
 #
 file(GLOB SOURCES
-    "${CMAKE_SOURCE_DIR}/*.cpp"
+    ${CMAKE_SOURCE_DIR}/*.cpp
 )
 
 set(TARGET_NAMES)
