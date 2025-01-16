@@ -40,64 +40,62 @@ namespace zed {
         int width;
         int height;
 
-        StereoDimensions()
-        {
+        StereoDimensions() {
             width = 0;
             height = 0;
         }
 
-        StereoDimensions(Resolution resolution)
-        {
+        StereoDimensions(Resolution resolution) {
             switch (resolution) {
-            case HD2K:
-                width = 2208 * 2;
-                height = 1242;
-                break;
-            case HD1080:
-                width = 1920 * 2;
-                height = 1080;
-                break;
-            case HD720:
-                width = 1280 * 2;
-                height = 720;
-                break;
-            case VGA:
-                width = 672 * 2;
-                height = 376;
-                break;
+                case HD2K:
+                    width = 2208 * 2;
+                    height = 1242;
+                    break;
+                case HD1080:
+                    width = 1920 * 2;
+                    height = 1080;
+                    break;
+                case HD720:
+                    width = 1280 * 2;
+                    height = 720;
+                    break;
+                case VGA:
+                    width = 672 * 2;
+                    height = 376;
+                    break;
             }
         }
 
-        constexpr string toString() { return format("{} x {}", width, height); }
+        constexpr string toString() {
+            return format("{} x {}", width, height);
+        }
     };
 
-    constexpr string resolutionToString(Resolution resolution)
-    {
+    constexpr string resolutionToString(Resolution resolution) {
         switch (resolution) {
-        case HD2K:
-            return "HD2K";
-        case HD1080:
-            return "HD1080";
-        case HD720:
-            return "HD720";
-        case VGA:
-            return "VGA";
+            case HD2K:
+                return "HD2K";
+            case HD1080:
+                return "HD1080";
+            case HD720:
+                return "HD720";
+            case VGA:
+                return "VGA";
         }
     }
 
-    constexpr string colorSpaceToString(ColorSpace colorSpace)
-    {
+    constexpr string colorSpaceToString(ColorSpace colorSpace) {
         switch (colorSpace) {
-        case YUV:
-            return "YUV";
-        case GREYSCALE:
-            return "Greyscale";
-        case RGB:
-            return "RGB";
-        case BGR:
-            return "BGR";
+            case YUV:
+                return "YUV";
+            case GREYSCALE:
+                return "Greyscale";
+            case RGB:
+                return "RGB";
+            case BGR:
+                return "BGR";
         }
     }
-} // namespace zed
+}
 
 #endif

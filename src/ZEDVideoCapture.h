@@ -17,7 +17,7 @@ struct Format;
 - (BOOL)openWithResolution:(zed::Resolution)resolution frameRate:(zed::FrameRate)frameRate colorSpace:(zed::ColorSpace)colorSpace;
 - (void)close;
 
-- (void)start:(void (^_Nonnull)(uint8_t *_Nonnull, size_t, size_t, size_t))frameProcessingBlock;
+- (void)start:(void (^_Nonnull)(uint8_t* _Nonnull, size_t, size_t, size_t))frameProcessingBlock;
 - (void)stop;
 
 @end

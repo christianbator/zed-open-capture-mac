@@ -14,24 +14,28 @@ using namespace zed;
 namespace zed {
 
     struct VideoCaptureImpl {
-        ZEDVideoCapture *wrapped;
+        ZEDVideoCapture* wrapped;
 
-        VideoCaptureImpl() { wrapped = [[ZEDVideoCapture alloc] init]; };
+        VideoCaptureImpl() {
+            wrapped = [[ZEDVideoCapture alloc] init];
+        };
     };
 
-    VideoCapture::VideoCapture() { impl = new VideoCaptureImpl(); }
+    VideoCapture::VideoCapture() {
+        impl = new VideoCaptureImpl();
+    }
 
-    VideoCapture::~VideoCapture()
-    {
+    VideoCapture::~VideoCapture() {
         if (impl) {
             delete impl;
         }
     }
 
-    StereoDimensions VideoCapture::open(ColorSpace colorSpace) { return open(HD2K, FPS_15, colorSpace); }
+    StereoDimensions VideoCapture::open(ColorSpace colorSpace) {
+        return open(HD2K, FPS_15, colorSpace);
+    }
 
-    StereoDimensions VideoCapture::open(Resolution resolution, FrameRate frameRate, ColorSpace colorSpace)
-    {
+    StereoDimensions VideoCapture::open(Resolution resolution, FrameRate frameRate, ColorSpace colorSpace) {
         StereoDimensions stereoDimensions = StereoDimensions(resolution);
 
         bool result = [impl->wrapped openWithResolution:resolution frameRate:frameRate colorSpace:colorSpace];
@@ -43,16 +47,19 @@ namespace zed {
         return stereoDimensions;
     }
 
-    void VideoCapture::close() { [impl->wrapped close]; }
+    void VideoCapture::close() {
+        [impl->wrapped close];
+    }
 
-    void VideoCapture::start(function<void(uint8_t *, size_t, size_t, size_t)> frameProcessor)
-    {
-        void (^frameProcessingBlock)(uint8_t *, size_t, size_t, size_t) = ^(uint8_t *data, size_t height, size_t width, size_t channels) {
-          frameProcessor(data, height, width, channels);
+    void VideoCapture::start(function<void(uint8_t*, size_t, size_t, size_t)> frameProcessor) {
+        void (^frameProcessingBlock)(uint8_t*, size_t, size_t, size_t) = ^(uint8_t* data, size_t height, size_t width, size_t channels) {
+            frameProcessor(data, height, width, channels);
         };
 
         [impl->wrapped start:frameProcessingBlock];
     }
 
-    void VideoCapture::stop() { [impl->wrapped stop]; }
-} // namespace zed
+    void VideoCapture::stop() {
+        [impl->wrapped stop];
+    }
+}

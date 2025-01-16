@@ -15,31 +15,30 @@
 
 @interface ZEDVideoCapture () <AVCaptureVideoDataOutputSampleBufferDelegate>
 
-@property(nonatomic, assign) zed::Resolution resolution;
-@property(nonatomic, assign) zed::StereoDimensions stereoDimensions;
-@property(nonatomic, assign) zed::FrameRate frameRate;
-@property(nonatomic, assign) zed::ColorSpace colorSpace;
+@property (nonatomic, assign) zed::Resolution resolution;
+@property (nonatomic, assign) zed::StereoDimensions stereoDimensions;
+@property (nonatomic, assign) zed::FrameRate frameRate;
+@property (nonatomic, assign) zed::ColorSpace colorSpace;
 
-@property(nonatomic, strong, nullable) AVCaptureSession *session;
-@property(nonatomic, strong, nullable) AVCaptureDevice *device;
-@property(nonatomic, strong, nullable) AVCaptureDeviceFormat *desiredFormat;
-@property(nonatomic, assign) CMTime desiredFrameDuration;
-@property(nonatomic, strong, nullable) void (^frameProcessingBlock)(uint8_t *data, size_t height, size_t width, size_t channels);
+@property (nonatomic, strong, nullable) AVCaptureSession* session;
+@property (nonatomic, strong, nullable) AVCaptureDevice* device;
+@property (nonatomic, strong, nullable) AVCaptureDeviceFormat* desiredFormat;
+@property (nonatomic, assign) CMTime desiredFrameDuration;
+@property (nonatomic, strong, nullable) void (^frameProcessingBlock)(uint8_t* data, size_t height, size_t width, size_t channels);
 
-@property(nonatomic, strong) dispatch_queue_t queue;
+@property (nonatomic, strong) dispatch_queue_t queue;
 
 @end
 
 @implementation ZEDVideoCapture
 
-vImage_Buffer sourceImageBuffer = {.data = nil};
+vImage_Buffer sourceImageBuffer = { .data = nil };
 
-vImage_Buffer destinationImageBuffer = {.data = nil};
+vImage_Buffer destinationImageBuffer = { .data = nil };
 
 #pragma mark - Public Interface
 
-- (_Nonnull instancetype)init
-{
+- (_Nonnull instancetype)init {
     [super init];
 
     _queue = dispatch_queue_create("co.bator.zed-video-capture-mac", DISPATCH_QUEUE_SERIAL);
@@ -47,14 +46,13 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     return self;
 }
 
-- (BOOL)openWithResolution:(zed::Resolution)resolution frameRate:(zed::FrameRate)frameRate colorSpace:(zed::ColorSpace)colorSpace
-{
+- (BOOL)openWithResolution:(zed::Resolution)resolution frameRate:(zed::FrameRate)frameRate colorSpace:(zed::ColorSpace)colorSpace {
     //
     // Initialization
     //
     [self reset];
 
-    AVCaptureSession *session = [[AVCaptureSession alloc] init];
+    AVCaptureSession* session = [[AVCaptureSession alloc] init];
     [session beginConfiguration];
 
     zed::StereoDimensions stereoDimensions = zed::StereoDimensions(resolution);
@@ -62,15 +60,15 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     //
     // Device Discovery
     //
-    AVCaptureDevice *device = nil;
+    AVCaptureDevice* device = nil;
 
-    NSArray *zedDevices = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[ AVCaptureDeviceTypeExternal ]
+    NSArray* zedDevices = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:@[AVCaptureDeviceTypeExternal]
                                                                                  mediaType:AVMediaTypeVideo
                                                                                   position:AVCaptureDevicePositionUnspecified]
                               .devices;
 
-    for (AVCaptureDevice *zedDevice in zedDevices) {
-        NSString *deviceName = zedDevice.localizedName;
+    for (AVCaptureDevice* zedDevice in zedDevices) {
+        NSString* deviceName = zedDevice.localizedName;
         if ([deviceName rangeOfString:@"ZED" options:NSCaseInsensitiveSearch].location != NSNotFound) {
             device = zedDevice;
             break;
@@ -85,17 +83,17 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     //
     // Format Detection
     //
-    AVCaptureDeviceFormat *desiredFormat = nil;
+    AVCaptureDeviceFormat* desiredFormat = nil;
     CMTime desiredFrameDuration = kCMTimeInvalid;
 
-    for (AVCaptureDeviceFormat *format in device.formats) {
+    for (AVCaptureDeviceFormat* format in device.formats) {
         if ([format.mediaType isEqualToString:AVMediaTypeVideo]) {
             CMFormatDescriptionRef formatDescription = format.formatDescription;
             CMVideoDimensions formatDimensions = CMVideoFormatDescriptionGetDimensions(formatDescription);
 
             if (formatDimensions.width == stereoDimensions.width && formatDimensions.height == stereoDimensions.height) {
-                NSArray<AVFrameRateRange *> *frameRateRanges = format.videoSupportedFrameRateRanges;
-                for (AVFrameRateRange *frameRateRange in frameRateRanges) {
+                NSArray<AVFrameRateRange*>* frameRateRanges = format.videoSupportedFrameRateRanges;
+                for (AVFrameRateRange* frameRateRange in frameRateRanges) {
                     if (int(frameRateRange.minFrameRate) == frameRate && int(frameRateRange.maxFrameRate) == frameRate) {
                         desiredFormat = format;
                         desiredFrameDuration = frameRateRange.minFrameDuration;
@@ -116,8 +114,8 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     //
     // Input Initialization
     //
-    NSError *inputError = nil;
-    AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&inputError];
+    NSError* inputError = nil;
+    AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&inputError];
     if (inputError) {
         NSLog(@"Failed to create capture device input: %@", inputError.localizedDescription);
         return NO;
@@ -134,7 +132,7 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     //
     // Output Initialization
     //
-    AVCaptureVideoDataOutput *output = [[AVCaptureVideoDataOutput alloc] init];
+    AVCaptureVideoDataOutput* output = [[AVCaptureVideoDataOutput alloc] init];
 
     if ([session canAddOutput:output]) {
         [session addOutput:output];
@@ -144,29 +142,29 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
         return NO;
     }
 
-    NSMutableDictionary *outputVideoSettings =
-        @{(id)kCVPixelBufferWidthKey : @(stereoDimensions.width), (id)kCVPixelBufferHeightKey : @(stereoDimensions.height)}.mutableCopy;
+    NSMutableDictionary* outputVideoSettings =
+        @{ (id)kCVPixelBufferWidthKey: @(stereoDimensions.width), (id)kCVPixelBufferHeightKey: @(stereoDimensions.height) }.mutableCopy;
 
     switch (colorSpace) {
-    case zed::YUV:
-        outputVideoSettings[(id)kCVPixelBufferPixelFormatTypeKey] = @(kCVPixelFormatType_422YpCbCr8_yuvs);
-        break;
-    case zed::GREYSCALE:
-        outputVideoSettings[(id)kCVPixelBufferPixelFormatTypeKey] = @(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange);
-        break;
-    case zed::RGB:
-    case zed::BGR:
-        sourceImageBuffer.height = stereoDimensions.height;
-        sourceImageBuffer.width = stereoDimensions.width;
-        sourceImageBuffer.rowBytes = stereoDimensions.width * 4;
+        case zed::YUV:
+            outputVideoSettings[(id)kCVPixelBufferPixelFormatTypeKey] = @(kCVPixelFormatType_422YpCbCr8_yuvs);
+            break;
+        case zed::GREYSCALE:
+            outputVideoSettings[(id)kCVPixelBufferPixelFormatTypeKey] = @(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange);
+            break;
+        case zed::RGB:
+        case zed::BGR:
+            sourceImageBuffer.height = stereoDimensions.height;
+            sourceImageBuffer.width = stereoDimensions.width;
+            sourceImageBuffer.rowBytes = stereoDimensions.width * 4;
 
-        destinationImageBuffer.height = stereoDimensions.height;
-        destinationImageBuffer.width = stereoDimensions.width;
-        destinationImageBuffer.rowBytes = stereoDimensions.width * 3;
-        destinationImageBuffer.data = malloc(stereoDimensions.height * stereoDimensions.width * 3);
+            destinationImageBuffer.height = stereoDimensions.height;
+            destinationImageBuffer.width = stereoDimensions.width;
+            destinationImageBuffer.rowBytes = stereoDimensions.width * 3;
+            destinationImageBuffer.data = malloc(stereoDimensions.height * stereoDimensions.width * 3);
 
-        outputVideoSettings[(id)kCVPixelBufferPixelFormatTypeKey] = colorSpace == zed::RGB ? @(kCVPixelFormatType_32ARGB) : @(kCVPixelFormatType_32BGRA);
-        break;
+            outputVideoSettings[(id)kCVPixelBufferPixelFormatTypeKey] = colorSpace == zed::RGB ? @(kCVPixelFormatType_32ARGB) : @(kCVPixelFormatType_32BGRA);
+            break;
     }
 
     output.videoSettings = outputVideoSettings;
@@ -187,23 +185,26 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     _desiredFormat = desiredFormat;
     _desiredFrameDuration = desiredFrameDuration;
 
-    NSLog(@"Stream opened for %@ (stereo dimensions: %s, frame rate: %d fps, color space: %s)", _device.localizedName, _stereoDimensions.toString().c_str(),
-          _frameRate, zed::colorSpaceToString(_colorSpace).c_str());
+    NSLog(@"Stream opened for %@ (stereo dimensions: %s, frame rate: %d fps, "
+          @"color space: %s)",
+        _device.localizedName,
+        _stereoDimensions.toString().c_str(),
+        _frameRate,
+        zed::colorSpaceToString(_colorSpace).c_str());
 
     return YES;
 }
 
-- (void)close
-{
+- (void)close {
     [self stop];
     [self reset];
 }
 
-- (void)start:(void (^)(uint8_t *, size_t, size_t, size_t))frameProcessingBlock
-{
+- (void)start:(void (^)(uint8_t*, size_t, size_t, size_t))frameProcessingBlock {
     if (!_session) {
         @throw [NSException exceptionWithName:@"ZEDVideoCaptureRuntimeError"
-                                       reason:@"Attempted to start an unopened ZEDVideoCapture, call `open()` before `start()`"
+                                       reason:@"Attempted to start an unopened ZEDVideoCapture, "
+                                              @"call `open()` before `start()`"
                                      userInfo:nil];
     }
 
@@ -220,8 +221,7 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     [_device unlockForConfiguration];
 }
 
-- (void)captureOutput:(AVCaptureOutput *)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
-{
+- (void)captureOutput:(AVCaptureOutput*)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection*)connection {
     if (!_frameProcessingBlock) {
         return;
     }
@@ -234,21 +234,21 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     size_t width = CVPixelBufferGetWidth(pixelBuffer);
 
     if (_colorSpace == zed::YUV) {
-        uint8_t *yuvData = (uint8_t *)CVPixelBufferGetBaseAddress(pixelBuffer);
+        uint8_t* yuvData = (uint8_t*)CVPixelBufferGetBaseAddress(pixelBuffer);
 
         dispatch_async(dispatch_get_main_queue(), ^{
             _frameProcessingBlock(yuvData, height, width, 2);
         });
     }
     else if (_colorSpace == zed::GREYSCALE) {
-        uint8_t *greyscaleData = (uint8_t *)CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0);
+        uint8_t* greyscaleData = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0);
 
         dispatch_async(dispatch_get_main_queue(), ^{
             _frameProcessingBlock(greyscaleData, height, width, 1);
         });
     }
     else if (_colorSpace == zed::RGB) {
-        sourceImageBuffer.data = (uint8_t *)CVPixelBufferGetBaseAddress(pixelBuffer);
+        sourceImageBuffer.data = (uint8_t*)CVPixelBufferGetBaseAddress(pixelBuffer);
 
         vImage_Error conversionError = vImageConvert_ARGB8888toRGB888(&sourceImageBuffer, &destinationImageBuffer, kvImageNoFlags);
 
@@ -256,14 +256,14 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
             @throw [NSException exceptionWithName:@"ZEDVideoCaptureRuntimeError" reason:@"Failed to convert video frame to RGB color space" userInfo:nil];
         }
 
-        uint8_t *rgbData = (uint8_t *)destinationImageBuffer.data;
+        uint8_t* rgbData = (uint8_t*)destinationImageBuffer.data;
 
         dispatch_async(dispatch_get_main_queue(), ^{
             _frameProcessingBlock(rgbData, height, width, 3);
         });
     }
     else if (_colorSpace == zed::BGR) {
-        sourceImageBuffer.data = (uint8_t *)CVPixelBufferGetBaseAddress(pixelBuffer);
+        sourceImageBuffer.data = (uint8_t*)CVPixelBufferGetBaseAddress(pixelBuffer);
 
         vImage_Error conversionError = vImageConvert_BGRA8888toBGR888(&sourceImageBuffer, &destinationImageBuffer, kvImageNoFlags);
 
@@ -271,7 +271,7 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
             @throw [NSException exceptionWithName:@"ZEDVideoCaptureRuntimeError" reason:@"Failed to convert video frame to BGR color space" userInfo:nil];
         }
 
-        uint8_t *bgrData = (uint8_t *)destinationImageBuffer.data;
+        uint8_t* bgrData = (uint8_t*)destinationImageBuffer.data;
 
         dispatch_async(dispatch_get_main_queue(), ^{
             _frameProcessingBlock(bgrData, height, width, 3);
@@ -281,8 +281,7 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
 }
 
-- (void)stop
-{
+- (void)stop {
     if (_session) {
         [_session stopRunning];
     }
@@ -297,8 +296,7 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
 
 #pragma mark - Private
 
-- (void)reset
-{
+- (void)reset {
     _frameProcessingBlock = nil;
     _desiredFrameDuration = kCMTimeInvalid;
     _desiredFormat = nil;
@@ -311,16 +309,14 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     }
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
     [self reset];
     [super dealloc];
 }
 
 #pragma mark - Utilities
 
-- (void)logCMTime:(CMTime)time
-{
+- (void)logCMTime:(CMTime)time {
     int value = time.value;
     int timescale = time.timescale;
 
@@ -328,60 +324,6 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     int frameDuration = floor(1.0 / float(frameRate) * 1000.0);
 
     NSLog(@"FPS: %d (%d ms)", frameRate, frameDuration);
-}
-
-- (void)logAvailableOutputFormats:(AVCaptureVideoDataOutput *)output
-{
-    NSDictionary *formats = self.formats;
-    NSMutableArray *formatDescriptions = [NSMutableArray array];
-
-    for (NSNumber *format in [output availableVideoCVPixelFormatTypes]) {
-        [formatDescriptions addObject:[formats objectForKey:format]];
-    }
-
-    NSLog(@"Available output formats: %@", formatDescriptions);
-}
-
-- (NSDictionary *_Nonnull)formats
-{
-    return [NSDictionary
-        dictionaryWithObjectsAndKeys:@"kCVPixelFormatType_1Monochrome", [NSNumber numberWithInt:kCVPixelFormatType_1Monochrome], @"kCVPixelFormatType_2Indexed",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_2Indexed], @"kCVPixelFormatType_4Indexed",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_4Indexed], @"kCVPixelFormatType_8Indexed",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_8Indexed], @"kCVPixelFormatType_1IndexedGray_WhiteIsZero",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_1IndexedGray_WhiteIsZero], @"kCVPixelFormatType_2IndexedGray_WhiteIsZero",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_2IndexedGray_WhiteIsZero], @"kCVPixelFormatType_4IndexedGray_WhiteIsZero",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_4IndexedGray_WhiteIsZero], @"kCVPixelFormatType_8IndexedGray_WhiteIsZero",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_8IndexedGray_WhiteIsZero], @"kCVPixelFormatType_16BE555",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_16BE555], @"kCVPixelFormatType_16LE555",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_16LE555], @"kCVPixelFormatType_16LE5551",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_16LE5551], @"kCVPixelFormatType_16BE565",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_16BE565], @"kCVPixelFormatType_16LE565",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_16LE565], @"kCVPixelFormatType_24RGB",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_24RGB], @"kCVPixelFormatType_24BGR",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_24BGR], @"kCVPixelFormatType_32ARGB",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_32ARGB], @"kCVPixelFormatType_32BGRA",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_32BGRA], @"kCVPixelFormatType_32ABGR",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_32ABGR], @"kCVPixelFormatType_32RGBA",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_32RGBA], @"kCVPixelFormatType_64ARGB",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_64ARGB], @"kCVPixelFormatType_48RGB",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_48RGB], @"kCVPixelFormatType_32AlphaGray",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_32AlphaGray], @"kCVPixelFormatType_16Gray",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_16Gray], @"kCVPixelFormatType_422YpCbCr8",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_422YpCbCr8], @"kCVPixelFormatType_4444YpCbCrA8",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_4444YpCbCrA8], @"kCVPixelFormatType_4444YpCbCrA8R",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_4444YpCbCrA8R], @"kCVPixelFormatType_444YpCbCr8",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_444YpCbCr8], @"kCVPixelFormatType_422YpCbCr16",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_422YpCbCr16], @"kCVPixelFormatType_422YpCbCr10",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_422YpCbCr10], @"kCVPixelFormatType_444YpCbCr10",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_444YpCbCr10], @"kCVPixelFormatType_420YpCbCr8Planar",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8Planar], @"kCVPixelFormatType_420YpCbCr8PlanarFullRange",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8PlanarFullRange], @"kCVPixelFormatType_422YpCbCr_4A_8BiPlanar",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_422YpCbCr_4A_8BiPlanar], @"kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange",
-                                     [NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange],
-                                     @"kCVPixelFormatType_420YpCbCr8BiPlanarFullRange", [NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange],
-                                     @"kCVPixelFormatType_422YpCbCr8_yuvs", [NSNumber numberWithInt:kCVPixelFormatType_422YpCbCr8_yuvs],
-                                     @"kCVPixelFormatType_422YpCbCr8FullRange", [NSNumber numberWithInt:kCVPixelFormatType_422YpCbCr8FullRange], nil];
 }
 
 @end

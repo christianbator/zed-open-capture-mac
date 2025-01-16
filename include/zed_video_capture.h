@@ -19,18 +19,17 @@ namespace zed {
 
     class VideoCapture {
 
-      private:
-        VideoCaptureImpl *impl;
+    private:
+        VideoCaptureImpl* impl;
         StereoDimensions open(Resolution resolution, FrameRate frameRate, ColorSpace colorSpace);
 
-      public:
+    public:
         VideoCapture();
         ~VideoCapture();
 
         StereoDimensions open(ColorSpace colorSpace);
 
-        template <Resolution resolution, FrameRate frameRate> StereoDimensions open(ColorSpace colorSpace)
-        {
+        template <Resolution resolution, FrameRate frameRate> StereoDimensions open(ColorSpace colorSpace) {
             // Verify frame rate for resolution at compile-time
             if constexpr (resolution == HD2K) {
                 static_assert(frameRate == FPS_15, "Invalid frame rate for HD2K resolution, available frame rates: FPS_15");
@@ -40,11 +39,11 @@ namespace zed {
             }
             else if constexpr (resolution == HD720) {
                 static_assert(frameRate == FPS_15 || frameRate == FPS_30 || frameRate == FPS_60,
-                              "Invalid frame rate for HD720 resolution, available frame rates: FPS_15, FPS_30, FPS_60");
+                    "Invalid frame rate for HD720 resolution, available frame rates: FPS_15, FPS_30, FPS_60");
             }
             else if constexpr (resolution == VGA) {
                 static_assert(frameRate == FPS_15 || frameRate == FPS_30 || frameRate == FPS_60 || frameRate == FPS_100,
-                              "Invalid frame rate for VGA resolution, available frame rates: FPS_15, FPS_30, FPS_60, FPS_100");
+                    "Invalid frame rate for VGA resolution, available frame rates: FPS_15, FPS_30, FPS_60, FPS_100");
             }
             else {
                 static_assert(false, "Unsupported resolution");
@@ -55,10 +54,10 @@ namespace zed {
 
         void close();
 
-        void start(function<void(uint8_t *, size_t, size_t, size_t)> frameProcessor);
+        void start(function<void(uint8_t*, size_t, size_t, size_t)> frameProcessor);
         void stop();
     };
 
-} // namespace zed
+}
 
 #endif
