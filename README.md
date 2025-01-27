@@ -11,7 +11,7 @@
   <a href="#run">Run</a> • 
   <a href="#examples">Examples</a> •
   <a href="#documentation">Documentation</a> •
-  <a href="#related">Related</a> •
+  <a href="#related">Related</a>
 </p>
 <br>
 

@@ -8,8 +8,6 @@
 #include "../include/zed_video_capture_format.h"
 #include <Foundation/Foundation.h>
 
-struct Format;
-
 @interface ZEDVideoCapture : NSObject
 
 - (_Nonnull instancetype)init;

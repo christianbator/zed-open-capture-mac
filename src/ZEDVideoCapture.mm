@@ -6,6 +6,7 @@
 //
 
 #import "ZEDVideoCapture.h"
+#include "ZEDCamera.h"
 #import <AVFoundation/AVFoundation.h>
 #import <Accelerate/Accelerate.h>
 #import <CoreGraphics/CoreGraphics.h>
@@ -32,9 +33,8 @@
 
 @implementation ZEDVideoCapture
 
-vImage_Buffer sourceImageBuffer = { .data = nil };
-
-vImage_Buffer destinationImageBuffer = { .data = nil };
+vImage_Buffer sourceImageBuffer = {.data = nil};
+vImage_Buffer destinationImageBuffer = {.data = nil};
 
 #pragma mark - Public Interface
 
@@ -46,11 +46,26 @@ vImage_Buffer destinationImageBuffer = { .data = nil };
     return self;
 }
 
+- (void)getAssociatedUVCInterface {
+    ZEDCamera* camera = [ZEDCamera first];
+
+    NSLog(@"Camera control values:\nbrightness = %u\nsharpness = %u\ncontrast = %u\nhue = %u\nsaturation = %u\ngamma = %u\ngain = %u\n",
+        camera.brightness,
+        camera.sharpness,
+        camera.contrast,
+        camera.hue,
+        camera.saturation,
+        camera.gamma,
+        camera.gain);
+}
+
 - (BOOL)openWithResolution:(zed::Resolution)resolution frameRate:(zed::FrameRate)frameRate colorSpace:(zed::ColorSpace)colorSpace {
     //
     // Initialization
     //
     [self reset];
+
+    [self getAssociatedUVCInterface];
 
     AVCaptureSession* session = [[AVCaptureSession alloc] init];
     [session beginConfiguration];
@@ -143,7 +158,7 @@ vImage_Buffer destinationImageBuffer = { .data = nil };
     }
 
     NSMutableDictionary* outputVideoSettings =
-        @{ (id)kCVPixelBufferWidthKey: @(stereoDimensions.width), (id)kCVPixelBufferHeightKey: @(stereoDimensions.height) }.mutableCopy;
+        @{(id)kCVPixelBufferWidthKey: @(stereoDimensions.width), (id)kCVPixelBufferHeightKey: @(stereoDimensions.height)}.mutableCopy;
 
     switch (colorSpace) {
         case zed::YUV:
