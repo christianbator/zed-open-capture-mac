@@ -27,6 +27,33 @@ namespace zed {
         VideoCapture();
         ~VideoCapture();
 
+        string getDeviceID();
+        string getDeviceName();
+
+        uint16_t getBrightness();
+        void setBrightness(uint16_t brightness);
+
+        uint16_t getContrast();
+        void setContrast(uint16_t contrast);
+
+        uint16_t getHue();
+        void setHue(uint16_t hue);
+
+        uint16_t getSaturation();
+        void setSaturation(uint16_t saturation);
+
+        uint16_t getSharpness();
+        void setSharpness(uint16_t sharpness);
+
+        uint16_t getGamma();
+        void setGamma(uint16_t gamma);
+
+        uint16_t getWhiteBalanceTemperature();
+        void setWhiteBalanceTemperature(uint16_t whiteBalanceTemperature);
+
+        bool getAutoWhiteBalanceTemperature();
+        void setAutoWhiteBalanceTemperature(bool autoWhiteBalanceTemperature);
+
         StereoDimensions open(ColorSpace colorSpace);
 
         template <Resolution resolution, FrameRate frameRate> StereoDimensions open(ColorSpace colorSpace) {

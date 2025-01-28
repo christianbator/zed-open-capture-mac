@@ -52,6 +52,7 @@ target_link_libraries(${PROJECT_NAME}
     "-framework CoreVideo"
     "-framework CoreGraphics"
     "-framework Accelerate"
+    "-framework IOKit"
 )
 
 #

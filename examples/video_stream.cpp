@@ -1,5 +1,5 @@
 //
-// opencv_video_stream.cpp
+// video_stream.cpp
 // zed-open-capture-mac
 //
 // Created by Christian Bator on 01/13/2025
@@ -109,7 +109,7 @@ void showBGRVideo() {
 //
 int usageError(string error) {
     cerr << "> Error: " << error << endl;
-    cerr << "> Usage: opencv_video_stream (yuv | greyscale | rgb | bgr)" << endl;
+    cerr << "> Usage: video_stream (yuv | greyscale | rgb | bgr)" << endl;
 
     return 2;
 }

@@ -31,6 +31,87 @@ namespace zed {
         }
     }
 
+    string VideoCapture::getDeviceID() {
+        string deviceID = [impl->wrapped.deviceID UTF8String];
+        return deviceID;
+    }
+
+    string VideoCapture::getDeviceName() {
+        string deviceName = [impl->wrapped.deviceName UTF8String];
+        return deviceName;
+    }
+
+    uint16_t VideoCapture::getBrightness() {
+        return impl->wrapped.brightness;
+    }
+
+    void VideoCapture::setBrightness(uint16_t brightness) {
+        assert(brightness >= 0 && brightness <= 8);
+        [impl->wrapped setBrightness:brightness];
+    }
+
+    uint16_t VideoCapture::getContrast() {
+        return impl->wrapped.contrast;
+    }
+
+    void VideoCapture::setContrast(uint16_t contrast) {
+        assert(contrast >= 0 && contrast <= 8);
+        [impl->wrapped setContrast:contrast];
+    }
+
+    uint16_t VideoCapture::getHue() {
+        return impl->wrapped.hue;
+    }
+
+    void VideoCapture::setHue(uint16_t hue) {
+        assert(hue >= 0 && hue <= 11);
+        [impl->wrapped setHue:hue];
+    }
+
+    uint16_t VideoCapture::getSaturation() {
+        return impl->wrapped.saturation;
+    }
+
+    void VideoCapture::setSaturation(uint16_t saturation) {
+        assert(saturation >= 0 && saturation <= 8);
+        [impl->wrapped setSaturation:saturation];
+    }
+
+    uint16_t VideoCapture::getSharpness() {
+        return impl->wrapped.sharpness;
+    }
+
+    void VideoCapture::setSharpness(uint16_t sharpness) {
+        assert(sharpness >= 0 && sharpness <= 8);
+        [impl->wrapped setSharpness:sharpness];
+    }
+
+    uint16_t VideoCapture::getGamma() {
+        return impl->wrapped.gamma;
+    }
+
+    void VideoCapture::setGamma(uint16_t gamma) {
+        assert(gamma >= 0 && gamma <= 8);
+        [impl->wrapped setGamma:gamma];
+    }
+
+    uint16_t VideoCapture::getWhiteBalanceTemperature() {
+        return impl->wrapped.whiteBalanceTemperature;
+    }
+
+    void VideoCapture::setWhiteBalanceTemperature(uint16_t whiteBalanceTemperature) {
+        assert(whiteBalanceTemperature >= 2800 && whiteBalanceTemperature <= 6500 && (whiteBalanceTemperature % 100 == 0));
+        [impl->wrapped setWhiteBalanceTemperature:whiteBalanceTemperature];
+    }
+
+    bool VideoCapture::getAutoWhiteBalanceTemperature() {
+        return impl->wrapped.autoWhiteBalanceTemperature;
+    }
+
+    void VideoCapture::setAutoWhiteBalanceTemperature(bool autoWhiteBalanceTemperature) {
+        [impl->wrapped setAutoWhiteBalanceTemperature:autoWhiteBalanceTemperature];
+    }
+
     StereoDimensions VideoCapture::open(ColorSpace colorSpace) {
         return open(HD2K, FPS_15, colorSpace);
     }

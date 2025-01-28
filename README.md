@@ -29,19 +29,15 @@
     - [x] HD720: 1280 x 720 (15, 30, 60 fps)
     - [x] VGA: 672 x 376 (15, 30, 60, 100 fps)
 - Camera control
+    - [x] Brightness
+    - [x] Contrast
+    - [x] Hue
+    - [x] Saturation
+    - [x] Sharpness
+    - [x] Gamma
+    - [x] White balance temperature
+    - [x] Auto white balance temperature
     - [ ] LED on / off
-    - [ ] Brightness
-    - [ ] Sharpness
-    - [ ] Contrast
-    - [ ] Hue
-    - [ ] Saturation
-    - [ ] White balance
-    - [ ] Gamma
-    - [ ] Gain
-    - [ ] Exposure
-    - [ ] Auto white balance
-    - [ ] Auto exposure and gain
-    - [ ] Region of interest for auto exposure and gain
 - Sensor data capture
     - [ ] 6-DOF IMU (3-DOF accelerometer & 3-DOF gyroscope)
     - [ ] 3-DOF Magnetometer (ZED 2 & ZED 2i)
@@ -198,10 +194,15 @@ cmake --build build
 
 The following examples are built:
 
-### Example: opencv_video_stream
+### Example: video_stream
 
-- Usage: `./opencv_video_stream (yuv | greyscale | rgb | bgr)`
-- Displays the connected ZED camera feed in the desired color space with OpenCV
+- Usage: `./video_stream (yuv | greyscale | rgb | bgr)`
+- Displays the connected ZED camera stream in the desired color space with OpenCV
+
+### Example: camera_controls
+
+- Usage: `./camera_controls`
+- Shows how to adjust camera controls and displays the stream with OpenCV
 
 ## Documentation
 
