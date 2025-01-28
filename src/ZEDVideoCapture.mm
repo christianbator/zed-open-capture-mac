@@ -19,8 +19,8 @@
 //
 // UVC Request Codes
 //
-#define kUVCSetCurrent 0x01
 #define kUVCGetCurrent 0x81
+#define kUVCSetCurrent 0x01
 
 //
 // ZED Interface
@@ -36,7 +36,6 @@
 #define kZEDHue 6
 #define kZEDSaturation 7
 #define kZEDSharpness 8
-#define kZEDGamma 9
 #define kZEDWhiteBalanceTemperature 10
 #define kZEDAutoWhiteBalanceTemperature 11
 
@@ -71,6 +70,14 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
 
 - (_Nonnull instancetype)init {
     [super init];
+
+    _defaultBrightness = 4;
+    _defaultContrast = 4;
+    _defaultHue = 0;
+    _defaultSaturation = 4;
+    _defaultSharpness = 0;
+    _defaultWhiteBalanceTemperature = 4600;
+    _defaultAutoWhiteBalanceTemperature = YES;
 
     _queue = dispatch_queue_create("co.bator.zed-video-capture-mac", DISPATCH_QUEUE_SERIAL);
 
@@ -461,12 +468,20 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     [self setValue:brightness forCode:kZEDBrightness];
 }
 
+- (void)resetBrightness {
+    [self setValue:self.defaultBrightness forCode:kZEDBrightness];
+}
+
 - (UInt16)contrast {
     return [self getValueForCode:kZEDContrast];
 }
 
 - (void)setContrast:(UInt16)contrast {
     [self setValue:contrast forCode:kZEDContrast];
+}
+
+- (void)resetContrast {
+    [self setValue:self.defaultContrast forCode:kZEDContrast];
 }
 
 - (UInt16)hue {
@@ -477,12 +492,20 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     [self setValue:hue forCode:kZEDHue];
 }
 
+- (void)resetHue {
+    [self setValue:self.defaultHue forCode:kZEDHue];
+}
+
 - (UInt16)saturation {
     return [self getValueForCode:kZEDSaturation];
 }
 
 - (void)setSaturation:(UInt16)saturation {
     [self setValue:saturation forCode:kZEDSaturation];
+}
+
+- (void)resetSaturation {
+    [self setValue:self.defaultSaturation forCode:kZEDSaturation];
 }
 
 - (UInt16)sharpness {
@@ -493,6 +516,11 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     [self setValue:sharpness forCode:kZEDSharpness];
 }
 
+- (void)resetSharpness {
+    [self setValue:self.defaultSharpness forCode:kZEDSharpness];
+}
+
+
 - (UInt16)whiteBalanceTemperature {
     return [self getValueForCode:kZEDWhiteBalanceTemperature];
 }
@@ -502,12 +530,21 @@ vImage_Buffer destinationImageBuffer = {.data = nil};
     [self setValue:whiteBalanceTemperature forCode:kZEDWhiteBalanceTemperature];
 }
 
+- (void)resetWhiteBalanceTemperature {
+    [self setValue:self.defaultWhiteBalanceTemperature forCode:kZEDWhiteBalanceTemperature];
+}
+
+
 - (BOOL)autoWhiteBalanceTemperature {
     return [self getValueForCode:kZEDAutoWhiteBalanceTemperature];
 }
 
 - (void)setAutoWhiteBalanceTemperature:(BOOL)autoWhiteBalanceTemperature {
     [self setValue:autoWhiteBalanceTemperature forCode:kZEDAutoWhiteBalanceTemperature];
+}
+
+- (void)resetAutoWhiteBalanceTemperature {
+    [self setValue:self.defaultAutoWhiteBalanceTemperature forCode:kZEDAutoWhiteBalanceTemperature];
 }
 
 #pragma mark - Private

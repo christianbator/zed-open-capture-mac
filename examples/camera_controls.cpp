@@ -42,9 +42,6 @@ int main(int argc, const char* argv[]) {
     videoCapture.setSharpness(4);
     cout << "Sharpness: " << videoCapture.getSharpness() << endl;
 
-    videoCapture.setGamma(3);
-    cout << "Gamma: " << videoCapture.getGamma() << endl;
-
     videoCapture.setAutoWhiteBalanceTemperature(false);
     cout << "Auto white balance temperature: " << boolalpha << videoCapture.getAutoWhiteBalanceTemperature() << endl;
 

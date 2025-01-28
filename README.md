@@ -34,7 +34,6 @@
     - [x] Hue
     - [x] Saturation
     - [x] Sharpness
-    - [x] Gamma
     - [x] White balance temperature
     - [x] Auto white balance temperature
     - [ ] LED on / off
@@ -162,6 +161,21 @@ videoCapture.stop();
 
 // Close the capture stream at any point
 videoCapture.close();
+```
+
+Camera controls (must call `videoCapture.open()` before using camera controls):
+```c++
+// Read current value
+uint16_t brightness = videoCapture.getBrightness();
+
+// Set current value
+videoCapture.setBrightness(7);
+
+// Read default value
+uint16_t defaultBrightness = videoCapture.getDefaultBrightness();
+
+// Reset to default value
+videoCapture.resetBrightness();
 ```
 
 ### Sensor data

@@ -20,9 +20,24 @@
 @property (nonatomic) UInt16 hue;
 @property (nonatomic) UInt16 saturation;
 @property (nonatomic) UInt16 sharpness;
-@property (nonatomic) UInt16 gamma;
 @property (nonatomic) UInt16 whiteBalanceTemperature;
 @property (nonatomic) BOOL autoWhiteBalanceTemperature;
+
+@property (nonatomic, readonly) UInt16 defaultBrightness;
+@property (nonatomic, readonly) UInt16 defaultContrast;
+@property (nonatomic, readonly) UInt16 defaultHue;
+@property (nonatomic, readonly) UInt16 defaultSaturation;
+@property (nonatomic, readonly) UInt16 defaultSharpness;
+@property (nonatomic, readonly) UInt16 defaultWhiteBalanceTemperature;
+@property (nonatomic, readonly) BOOL defaultAutoWhiteBalanceTemperature;
+
+- (void)resetBrightness;
+- (void)resetContrast;
+- (void)resetHue;
+- (void)resetSaturation;
+- (void)resetSharpness;
+- (void)resetWhiteBalanceTemperature;
+- (void)resetAutoWhiteBalanceTemperature;
 
 - (BOOL)openWithResolution:(zed::Resolution)resolution frameRate:(zed::FrameRate)frameRate colorSpace:(zed::ColorSpace)colorSpace;
 - (void)close;

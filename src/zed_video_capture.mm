@@ -50,6 +50,14 @@ namespace zed {
         [impl->wrapped setBrightness:brightness];
     }
 
+    uint16_t VideoCapture::getDefaultBrightness() {
+        return impl->wrapped.defaultBrightness;
+    }
+
+    void VideoCapture::resetBrightness() {
+        [impl->wrapped resetBrightness];
+    }
+
     uint16_t VideoCapture::getContrast() {
         return impl->wrapped.contrast;
     }
@@ -57,6 +65,14 @@ namespace zed {
     void VideoCapture::setContrast(uint16_t contrast) {
         assert(contrast >= 0 && contrast <= 8);
         [impl->wrapped setContrast:contrast];
+    }
+
+    uint16_t VideoCapture::getDefaultContrast() {
+        return impl->wrapped.defaultContrast;
+    }
+
+    void VideoCapture::resetContrast() {
+        [impl->wrapped resetContrast];
     }
 
     uint16_t VideoCapture::getHue() {
@@ -68,6 +84,14 @@ namespace zed {
         [impl->wrapped setHue:hue];
     }
 
+    uint16_t VideoCapture::getDefaultHue() {
+        return impl->wrapped.defaultHue;
+    }
+
+    void VideoCapture::resetHue() {
+        [impl->wrapped resetHue];
+    }
+
     uint16_t VideoCapture::getSaturation() {
         return impl->wrapped.saturation;
     }
@@ -75,6 +99,14 @@ namespace zed {
     void VideoCapture::setSaturation(uint16_t saturation) {
         assert(saturation >= 0 && saturation <= 8);
         [impl->wrapped setSaturation:saturation];
+    }
+
+    uint16_t VideoCapture::getDefaultSaturation() {
+        return impl->wrapped.defaultSaturation;
+    }
+
+    void VideoCapture::resetSaturation() {
+        [impl->wrapped resetSaturation];
     }
 
     uint16_t VideoCapture::getSharpness() {
@@ -86,13 +118,12 @@ namespace zed {
         [impl->wrapped setSharpness:sharpness];
     }
 
-    uint16_t VideoCapture::getGamma() {
-        return impl->wrapped.gamma;
+    uint16_t VideoCapture::getDefaultSharpness() {
+        return impl->wrapped.defaultSharpness;
     }
 
-    void VideoCapture::setGamma(uint16_t gamma) {
-        assert(gamma >= 0 && gamma <= 8);
-        [impl->wrapped setGamma:gamma];
+    void VideoCapture::resetSharpness() {
+        [impl->wrapped resetSharpness];
     }
 
     uint16_t VideoCapture::getWhiteBalanceTemperature() {
@@ -104,12 +135,28 @@ namespace zed {
         [impl->wrapped setWhiteBalanceTemperature:whiteBalanceTemperature];
     }
 
+    uint16_t VideoCapture::getDefaultWhiteBalanceTemperature() {
+        return impl->wrapped.defaultWhiteBalanceTemperature;
+    }
+
+    void VideoCapture::resetWhiteBalanceTemperature() {
+        [impl->wrapped resetWhiteBalanceTemperature];
+    }
+
     bool VideoCapture::getAutoWhiteBalanceTemperature() {
         return impl->wrapped.autoWhiteBalanceTemperature;
     }
 
     void VideoCapture::setAutoWhiteBalanceTemperature(bool autoWhiteBalanceTemperature) {
         [impl->wrapped setAutoWhiteBalanceTemperature:autoWhiteBalanceTemperature];
+    }
+
+    bool VideoCapture::getDefaultAutoWhiteBalanceTemperature() {
+        return impl->wrapped.defaultAutoWhiteBalanceTemperature;
+    }
+
+    void VideoCapture::resetAutoWhiteBalanceTemperature() {
+        [impl->wrapped resetAutoWhiteBalanceTemperature];
     }
 
     StereoDimensions VideoCapture::open(ColorSpace colorSpace) {
