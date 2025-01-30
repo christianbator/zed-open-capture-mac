@@ -35,6 +35,9 @@
     - [x] Hue
     - [x] Saturation
     - [x] Sharpness
+    - [ ] Gamma
+    - [ ] Gain
+    - [ ] Exposure
     - [x] White balance temperature
     - [x] Auto white balance temperature
 - Sensor data capture
