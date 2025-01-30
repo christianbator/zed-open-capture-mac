@@ -159,6 +159,14 @@ namespace zed {
         [impl->wrapped resetAutoWhiteBalanceTemperature];
     }
 
+    void VideoCapture::turnOnLED() {
+        [impl->wrapped turnOnLED];
+    }
+
+    void VideoCapture::turnOffLED() {
+        [impl->wrapped turnOffLED];
+    }
+
     StereoDimensions VideoCapture::open(ColorSpace colorSpace) {
         return open(HD2K, FPS_15, colorSpace);
     }

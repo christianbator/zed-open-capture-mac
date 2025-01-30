@@ -39,6 +39,9 @@
 - (void)resetWhiteBalanceTemperature;
 - (void)resetAutoWhiteBalanceTemperature;
 
+- (void)turnOnLED;
+- (void)turnOffLED;
+
 - (BOOL)openWithResolution:(zed::Resolution)resolution frameRate:(zed::FrameRate)frameRate colorSpace:(zed::ColorSpace)colorSpace;
 - (void)close;
 

@@ -65,6 +65,9 @@ namespace zed {
         bool getDefaultAutoWhiteBalanceTemperature();
         void resetAutoWhiteBalanceTemperature();
 
+        void turnOnLED();
+        void turnOffLED();
+
         StereoDimensions open(ColorSpace colorSpace);
 
         template <Resolution resolution, FrameRate frameRate> StereoDimensions open(ColorSpace colorSpace) {

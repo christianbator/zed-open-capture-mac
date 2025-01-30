@@ -29,6 +29,7 @@
     - [x] HD720: 1280 x 720 (15, 30, 60 fps)
     - [x] VGA: 672 x 376 (15, 30, 60, 100 fps)
 - Camera control
+    - [x] LED on / off
     - [x] Brightness
     - [x] Contrast
     - [x] Hue
@@ -36,7 +37,6 @@
     - [x] Sharpness
     - [x] White balance temperature
     - [x] Auto white balance temperature
-    - [ ] LED on / off
 - Sensor data capture
     - [ ] 6-DOF IMU (3-DOF accelerometer & 3-DOF gyroscope)
     - [ ] 3-DOF Magnetometer (ZED 2 & ZED 2i)
