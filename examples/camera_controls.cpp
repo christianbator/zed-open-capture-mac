@@ -19,13 +19,14 @@ int main(int argc, const char* argv[]) {
     StereoDimensions stereoDimensions = videoCapture.open(BGR);
     
     //
-    // Read camera properties
+    // Camera properties
     //
     cout << "Device ID: " << videoCapture.getDeviceID() << endl;
     cout << "Device Name: " << videoCapture.getDeviceName() << endl;
+    cout << "Device Serial Number: " << videoCapture.getDeviceSerialNumber() << endl;
 
     //
-    // Set / get camera control values
+    // Camera control values
     //
     videoCapture.setBrightness(8);
     cout << "Brightness: " << videoCapture.getBrightness() << endl;
