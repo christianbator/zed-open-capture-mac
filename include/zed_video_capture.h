@@ -9,6 +9,7 @@
 #define ZEDVIDEOCAPTURE_H
 
 #include "zed_video_capture_format.h"
+#include "zed_calibration_data.h"
 #include <functional>
 
 using namespace std;
@@ -18,10 +19,6 @@ namespace zed {
     struct VideoCaptureImpl;
 
     class VideoCapture {
-
-    private:
-        VideoCaptureImpl* impl;
-        StereoDimensions open(Resolution resolution, FrameRate frameRate, ColorSpace colorSpace);
 
     public:
         VideoCapture();
@@ -100,8 +97,13 @@ namespace zed {
 
         void start(function<void(uint8_t*, size_t, size_t, size_t)> frameProcessor);
         void stop();
-    };
 
+        CalibrationData getCalibrationData();
+
+    private:
+        VideoCaptureImpl* impl;
+        StereoDimensions open(Resolution resolution, FrameRate frameRate, ColorSpace colorSpace);
+    };
 }
 
 #endif

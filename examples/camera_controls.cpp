@@ -56,7 +56,7 @@ int main(int argc, const char* argv[]) {
 
     videoCapture.start([&bgrFrame, windowName](uint8_t* data, size_t height, size_t width, size_t channels) {
         memcpy(bgrFrame.data, data, height * width * channels);
-        cv::imshow("ZED", bgrFrame);
+        cv::imshow(windowName, bgrFrame);
     });
 
     while (true) {

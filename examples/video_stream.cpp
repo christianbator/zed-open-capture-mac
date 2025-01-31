@@ -32,8 +32,15 @@ void showYUVVideo() {
     });
 
     while (true) {
-        cv::waitKey(1);
+        int key = cv::waitKey(1);
+
+        if (key == 27) {
+            break;
+        }
     }
+
+    videoCapture.stop();
+    videoCapture.close();
 }
 
 //
@@ -54,8 +61,15 @@ void showGreyscaleVideo() {
     });
 
     while (true) {
-        cv::waitKey(1);
+        int key = cv::waitKey(1);
+
+        if (key == 27) {
+            break;
+        }
     }
+
+    videoCapture.stop();
+    videoCapture.close();
 }
 
 //
@@ -74,12 +88,19 @@ void showRGBVideo() {
     videoCapture.start([&rgbFrame, &bgrFrame, windowName](uint8_t* data, size_t height, size_t width, size_t channels) {
         memcpy(rgbFrame.data, data, height * width * channels);
         cv::cvtColor(rgbFrame, bgrFrame, cv::COLOR_RGB2BGR);
-        cv::imshow("ZED", bgrFrame);
+        cv::imshow(windowName, bgrFrame);
     });
 
     while (true) {
-        cv::waitKey(1);
+        int key = cv::waitKey(1);
+
+        if (key == 27) {
+            break;
+        }
     }
+
+    videoCapture.stop();
+    videoCapture.close();
 }
 
 //
@@ -96,12 +117,19 @@ void showBGRVideo() {
 
     videoCapture.start([&bgrFrame, windowName](uint8_t* data, size_t height, size_t width, size_t channels) {
         memcpy(bgrFrame.data, data, height * width * channels);
-        cv::imshow("ZED", bgrFrame);
+        cv::imshow(windowName, bgrFrame);
     });
 
     while (true) {
-        cv::waitKey(1);
+        int key = cv::waitKey(1);
+
+        if (key == 27) {
+            break;
+        }
     }
+
+    videoCapture.stop();
+    videoCapture.close();
 }
 
 //

@@ -211,4 +211,13 @@ namespace zed {
     void VideoCapture::stop() {
         [impl->wrapped stop];
     }
+
+    CalibrationData VideoCapture::getCalibrationData() {
+        string serialNumber = getDeviceSerialNumber();
+
+        CalibrationData calibrationData;
+        calibrationData.load(serialNumber);
+
+        return calibrationData;
+    }
 }

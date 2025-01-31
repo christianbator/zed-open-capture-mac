@@ -9,8 +9,8 @@
   <a href="#features">Features</a> •
   <a href="#install">Install</a> •
   <a href="#run">Run</a> • 
+  <a href="#calibration">Calibration</a> •
   <a href="#examples">Examples</a> •
-  <a href="#documentation">Documentation</a> •
   <a href="#related">Related</a>
 </p>
 <br>
@@ -46,7 +46,7 @@
     - [ ] Barometer (ZED 2 & ZED 2i)
     - [ ] Temperature (ZED 2 & ZED 2i)
 - Calibration & synchronization
-    - [ ] Camera calibration
+    - [x] Camera calibration
     - [ ] Video and sensor data synchronization
 
 ### Description
@@ -55,7 +55,7 @@ The ZED Open Capture library is a macOS library for low-level camera and sensor 
 
 The library provides methods to access raw video frames, calibration data, camera controls, and raw data from the USB3 camera sensors. A synchronization mechanism is provided to associate the correct sensor data with a particular video frame.
 
-**Note:** While the ZED SDK calibrates and compensates all output data, here the extracted raw data is not corrected by the camera nor sensor calibration parameters. You can retrieve camera and sensor calibration data using the [ZED SDK](https://www.stereolabs.com/docs/video/camera-calibration/) to correct your camera data.
+**Note:** The ZED SDK calibrates all output data, but here you're dealing with raw data. See <a href="#calibration">calibration</a> below for details about downloading and applying the calibration parameters to correct the camera data.
 
 ## Install
 
@@ -159,26 +159,21 @@ while (true) {
 
 Stopping the capture:
 ```c++
-
-// Stop the capture at any point
 videoCapture.stop();
 
-// Close the capture stream at any point
+// Resets the VideoCapture instance
 videoCapture.close();
 ```
 
-Camera controls (must call `videoCapture.open()` before using camera controls):
+Controlling the camera (be sure to call `videoCapture.open()` before using camera control methods):
 ```c++
-// Read current value
+
 uint16_t brightness = videoCapture.getBrightness();
 
-// Set current value
 videoCapture.setBrightness(7);
 
-// Read default value
 uint16_t defaultBrightness = videoCapture.getDefaultBrightness();
 
-// Reset to default value
 videoCapture.resetBrightness();
 ```
 
@@ -191,6 +186,24 @@ TODO...
 The given IMU and magnetometer data are expressed in the coordinate system shown below:
 
 ![](images/imu-axis.jpg)
+
+## Calibration
+
+You can load the factory calibration parameters for your particular camera from the StereoLabs servers using the supplied methods.
+
+```c++
+// Downloads calibration data to ~/.stereolabs/calibration and parses the parameters
+CalibrationData calibrationData = videoCapture.getCalibrationData();
+
+// View the data calibration data:
+cout << calibrationData.toString() << endl;
+
+// Access parameters by section and key (specify the type: int or float)
+float stereoBaseline = calibrationData.get<float>("STEREO", "Baseline");
+cout << "Stereo Baseline = " << stereoBaseline << endl;
+```
+
+See the calibration example below for details about using the calibration data to rectify video frames.
 
 ## Examples
 
@@ -218,10 +231,9 @@ The following examples are built:
 - [camera_controls](examples/camera_controls.cpp)
     - Shows how to adjust camera controls and displays the stream with OpenCV
     - Usage: `./build/camera_controls`
-
-## Documentation
-
-To do ...
+- [calibration](examples/calibration.cpp)
+    - Shows how to use camera calibration data to rectify frames with OpenCV
+    - Usage: `./build/calibration`
 
 ## Related
 

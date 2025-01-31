@@ -44,6 +44,8 @@ add_library(${PROJECT_NAME} SHARED
 #
 # Dependencies
 #
+find_package(CURL REQUIRED)
+
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     "-framework Foundation"
@@ -53,6 +55,7 @@ target_link_libraries(${PROJECT_NAME}
     "-framework CoreGraphics"
     "-framework Accelerate"
     "-framework IOKit"
+    CURL::libcurl
 )
 
 #
