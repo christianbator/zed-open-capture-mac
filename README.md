@@ -212,15 +212,12 @@ cmake --build build
 
 The following examples are built:
 
-**[Video Stream](examples/video_stream.cpp)**
-
-- Usage: `./build/video_stream (yuv | greyscale | rgb | bgr)`
-- Displays the connected ZED camera stream in the desired color space with OpenCV
-
-**[Camera Controls](examples/camera_controls.cpp)**
-
-- Usage: `./build/camera_controls`
-- Shows how to adjust camera controls and displays the stream with OpenCV
+- [video_stream](examples/video_stream.cpp)
+    - Usage: `./build/video_stream (yuv | greyscale | rgb | bgr)`
+    - Displays the connected ZED camera stream in the desired color space with OpenCV
+- [camera_controls](examples/camera_controls.cpp)**
+    - Usage: `./build/camera_controls`
+    - Shows how to adjust camera controls and displays the stream with OpenCV
 
 ## Documentation
 
