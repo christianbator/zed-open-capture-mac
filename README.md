@@ -125,7 +125,7 @@ sudo rm -r /opt/stereolabs
 
 ### Video capture
 
-Starting the capture:
+Opening the capture finds the ZED camera and initializes USB communcation. This is necessary before using any other methods on the VideoCapture instance:
 ```C++
 // Include the header
 #include "zed_video_capture.h"
@@ -139,7 +139,10 @@ videoCapture.open(RGB); // Defaults to HD2K and 15 fps
 // Alternatively open the stream with a specified resolution and frame rate
 // (see `zed_video_capture.h` for available resolutions, frame rates, and color spaces)
 videoCapture.open<HD720, FPS_60>(RGB);
+```
 
+Start the capture to begin processing frames:
+```C++
 // Start the capture, passing a closure or function that's invoked for each frame
 videoCapture.start([](uint8_t *data, size_t height, size_t width, size_t channels) {
     //
@@ -157,17 +160,18 @@ while (true) {
 }
 ```
 
-Stopping the capture:
+You can stop the stream at any point and restart it later:
 ```c++
 videoCapture.stop();
+```
 
-// Resets the VideoCapture instance
+Close the capture when you're done to free resources and release all USB device handles:
+```c++
 videoCapture.close();
 ```
 
-Controlling the camera (be sure to call `videoCapture.open()` before using camera control methods):
+Camera controls with get, set, and reset functionality are available:
 ```c++
-
 uint16_t brightness = videoCapture.getBrightness();
 
 videoCapture.setBrightness(7);
