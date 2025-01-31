@@ -200,12 +200,18 @@ You can load the factory calibration parameters for your particular camera from 
 // Downloads calibration data to ~/.stereolabs/calibration and parses the parameters
 CalibrationData calibrationData = videoCapture.getCalibrationData();
 
-// View the data calibration data:
+// View the calibration data:
 cout << calibrationData.toString() << endl;
 
 // Access parameters by section and key (specify the type: int or float)
 float stereoBaseline = calibrationData.get<float>("STEREO", "Baseline");
 cout << "Stereo Baseline = " << stereoBaseline << endl;
+```
+
+You can also pass a serial number to load the calibration data directly instead of using the convenience method above.
+```c++
+CalibrationData calibrationData;
+calibrationData.load("<DEVICE_SERIAL_NUMBER>");
 ```
 
 See the calibration example below for details about using the calibration data to rectify video frames.
