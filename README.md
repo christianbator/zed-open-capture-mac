@@ -133,10 +133,11 @@ Open the capture to find an attached ZED camera and initialize USB communcation.
 // Create a video capture instance
 VideoCapture videoCapture;
 
-// Open the stream with a color space (YUV, GREYSCALE, RGB, or BGR)
-videoCapture.open(RGB); // Defaults to HD2K and 15 fps
+// Open the stream with a color space: YUV, GREYSCALE, RGB, or BGR
+// (resolution defaults to HD2K and 15 fps)
+videoCapture.open(RGB);
 
-// Alternatively open the stream with a specified resolution and frame rate
+// Alternatively, open the stream with a specified resolution and frame rate
 // (see `zed_video_capture.h` for available resolutions, frame rates, and color spaces)
 videoCapture.open<HD720, FPS_60>(RGB);
 ```
