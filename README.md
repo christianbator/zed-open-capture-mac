@@ -190,7 +190,7 @@ TODO...
 
 The given IMU and magnetometer data are expressed in the coordinate system shown below:
 
-![](./images/imu-axis.jpg)
+![](images/imu-axis.jpg)
 
 ## Examples
 
@@ -212,12 +212,12 @@ cmake --build build
 
 The following examples are built:
 
-**Example 1: [video_stream](blob/main/examples/video_stream.cpp)**
+**Example 1: [video_stream](examples/video_stream.cpp)**
 
 - Usage: `./build/video_stream (yuv | greyscale | rgb | bgr)`
 - Displays the connected ZED camera stream in the desired color space with OpenCV
 
-**Example 2: [camera_controls](blob/main/examples/camera_controls.cpp)**
+**Example 2: [camera_controls](examples/camera_controls.cpp)**
 
 - Usage: `./build/camera_controls`
 - Shows how to adjust camera controls and displays the stream with OpenCV
