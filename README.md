@@ -125,7 +125,7 @@ sudo rm -r /opt/stereolabs
 
 ### Video capture
 
-Opening the capture finds the ZED camera and initializes USB communcation. This is necessary before using any other methods on the VideoCapture instance:
+Open the capture to find an attached ZED camera and initialize USB communcation. This is necessary before using any other methods on the VideoCapture instance:
 ```C++
 // Include the header
 #include "zed_video_capture.h"
