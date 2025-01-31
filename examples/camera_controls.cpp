@@ -59,8 +59,18 @@ int main(int argc, const char* argv[]) {
     });
 
     while (true) {
-        cv::waitKey(1);
+        int key = cv::waitKey(1);
+
+        if (key == 27) {
+            break;
+        }
+        else if (key == 'j') {
+            videoCapture.toggleLED();
+        }
     }
+
+    videoCapture.stop();
+    videoCapture.close();
 
     return 0;
 }

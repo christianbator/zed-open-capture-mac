@@ -14,6 +14,7 @@
 
 @property (nonatomic, strong, nonnull) NSString* deviceID;
 @property (nonatomic, strong, nonnull) NSString* deviceName;
+@property (nonatomic, strong, nonnull) NSString* deviceSerialNumber;
 
 @property (nonatomic) UInt16 brightness;
 @property (nonatomic) UInt16 contrast;
@@ -39,8 +40,10 @@
 - (void)resetWhiteBalanceTemperature;
 - (void)resetAutoWhiteBalanceTemperature;
 
+@property (nonatomic, readonly) BOOL isLEDOn;
 - (void)turnOnLED;
 - (void)turnOffLED;
+- (void)toggleLED;
 
 - (BOOL)openWithResolution:(zed::Resolution)resolution frameRate:(zed::FrameRate)frameRate colorSpace:(zed::ColorSpace)colorSpace;
 - (void)close;

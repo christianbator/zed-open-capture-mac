@@ -45,7 +45,8 @@
     - [ ] 3-DOF Magnetometer (ZED 2 & ZED 2i)
     - [ ] Barometer (ZED 2 & ZED 2i)
     - [ ] Temperature (ZED 2 & ZED 2i)
-- Synchronization
+- Calibration & synchronization
+    - [ ] Camera calibration
     - [ ] Video and sensor data synchronization
 
 ### Description
@@ -211,14 +212,14 @@ cmake --build build
 
 The following examples are built:
 
-### Example: video_stream
+### Example 1: video_stream
 
-- Usage: `./video_stream (yuv | greyscale | rgb | bgr)`
+- Usage: `./build/video_stream (yuv | greyscale | rgb | bgr)`
 - Displays the connected ZED camera stream in the desired color space with OpenCV
 
-### Example: camera_controls
+### Example 2: camera_controls
 
-- Usage: `./camera_controls`
+- Usage: `./build/camera_controls`
 - Shows how to adjust camera controls and displays the stream with OpenCV
 
 ## Documentation

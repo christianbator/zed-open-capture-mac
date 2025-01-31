@@ -29,6 +29,7 @@ namespace zed {
 
         string getDeviceID();
         string getDeviceName();
+        string getDeviceSerialNumber();
 
         uint16_t getBrightness();
         void setBrightness(uint16_t brightness);
@@ -65,8 +66,10 @@ namespace zed {
         bool getDefaultAutoWhiteBalanceTemperature();
         void resetAutoWhiteBalanceTemperature();
 
+        bool isLEDOn();
         void turnOnLED();
         void turnOffLED();
+        void toggleLED();
 
         StereoDimensions open(ColorSpace colorSpace);
 

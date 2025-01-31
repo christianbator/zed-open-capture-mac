@@ -41,6 +41,11 @@ namespace zed {
         return deviceName;
     }
 
+    string VideoCapture::getDeviceSerialNumber() {
+        string deviceSerialNumber = [impl->wrapped.deviceSerialNumber UTF8String];
+        return deviceSerialNumber;
+    }
+
     uint16_t VideoCapture::getBrightness() {
         return impl->wrapped.brightness;
     }
@@ -159,12 +164,20 @@ namespace zed {
         [impl->wrapped resetAutoWhiteBalanceTemperature];
     }
 
+    bool VideoCapture::isLEDOn() {
+        return impl->wrapped.isLEDOn;
+    }
+
     void VideoCapture::turnOnLED() {
         [impl->wrapped turnOnLED];
     }
 
     void VideoCapture::turnOffLED() {
         [impl->wrapped turnOffLED];
+    }
+
+    void VideoCapture::toggleLED() {
+        [impl->wrapped toggleLED];
     }
 
     StereoDimensions VideoCapture::open(ColorSpace colorSpace) {
