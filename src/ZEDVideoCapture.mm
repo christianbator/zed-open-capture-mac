@@ -17,33 +17,38 @@
 #import <IOKit/usb/IOUSBLib.h>
 
 //
-// ZED Device Interface
+// UVC Interface
 //
-#define kZEDUnit 4
-#define kZEDControl 2
-
-typedef NS_ENUM(UInt8, ZEDGPIONumber) { ZEDGPIONumberLED = 2 };
-
-typedef enum { ZEDControlReadRequest, ZEDControlWriteRequest } ZEDControlRequest;
-
-//
-// ZED UVC Interface
-//
-#define kUVCUnit 3
+#define kUVCUnitID 3
 #define kUVCControlValueSizeInBytes 2
-#define kUVCGetCurrent 0x81
-#define kUVCSetCurrent 0x01
+
+typedef NS_ENUM(UInt8, UVCRequestType) { UVCRequestTypeIn = 0xa1, UVCRequestTypeOut = 0x21 };
+typedef NS_ENUM(UInt8, UVCRequest) { UVCRequestGetCurrent = 0x81, UVCRequestSetCurrent = 0x01 };
 
 //
-// ZED UVC Control Codes
+// UVC Control Codes
 //
-#define kUVCBrightness 2
-#define kUVCContrast 3
-#define kUVCHue 6
-#define kUVCSaturation 7
-#define kUVCSharpness 8
-#define kUVCWhiteBalanceTemperature 10
-#define kUVCAutoWhiteBalanceTemperature 11
+typedef NS_ENUM(UInt8, UVCControlCode) {
+    UVCBrightness = 2,
+    UVCContrast = 3,
+    UVCHue = 6,
+    UVCSaturation = 7,
+    UVCSharpness = 8,
+    UVCWhiteBalanceTemperature = 10,
+    UVCAutoWhiteBalanceTemperature = 11
+};
+
+//
+// ZED Extension Unit Interface
+//
+#define kXUID 4
+#define kXUControlSelector 2
+#define kXUBufferSizeInBytes 384
+
+typedef NS_ENUM(UInt8, XURequestType) { XURequestTypeIn = 0xa0, XURequestTypeOut = 0x20 };
+typedef NS_ENUM(UInt8, XURequest) { XUReadRequest, XUWriteRequest };
+typedef NS_ENUM(UInt8, GPIONumber) { GPIONumberLED = 2 };
+typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 1 };
 
 //
 // ZEDVideoCapture
@@ -131,14 +136,14 @@ typedef enum { ZEDControlReadRequest, ZEDControlWriteRequest } ZEDControlRequest
     io_service_t usbDevice = [self findUSBDeviceWithID:device.uniqueID];
 
     if (!usbDevice) {
+        NSLog(@"Failed to find a USB device");
         return NO;
     }
 
-    NSString* deviceSerialNumber = [self getSerialNumberForUSBDevice:usbDevice];
-
     IOUSBInterfaceInterface300** uvcInterface = [self findUVCInterfaceForUSBDevice:usbDevice];
 
-    if (!deviceSerialNumber || !uvcInterface) {
+    if (!uvcInterface) {
+        NSLog(@"Failed to find a UVC interface");
         IOObjectRelease(usbDevice);
         return NO;
     }
@@ -240,7 +245,6 @@ typedef enum { ZEDControlReadRequest, ZEDControlWriteRequest } ZEDControlRequest
 
     _deviceID = device.uniqueID;
     _deviceName = device.localizedName;
-    _deviceSerialNumber = deviceSerialNumber;
 
     _resolution = resolution;
     _stereoDimensions = stereoDimensions;
@@ -317,18 +321,7 @@ typedef enum { ZEDControlReadRequest, ZEDControlWriteRequest } ZEDControlRequest
     return usbDevice;
 }
 
-- (NSString*)getSerialNumberForUSBDevice:(io_service_t)usbDevice {
-    CFTypeRef serialNumberRef = IORegistryEntrySearchCFProperty(usbDevice, kIOUSBPlane, CFSTR(kUSBSerialNumberString), kCFAllocatorDefault, 0);
-
-    if (serialNumberRef && CFGetTypeID(serialNumberRef) == CFStringGetTypeID()) {
-        return (__bridge NSString*)(serialNumberRef);
-    }
-    else {
-        return nil;
-    }
-}
-
-- (IOUSBInterfaceInterface300**)findUVCInterfaceForUSBDevice:(io_service_t)usbDevice {
+- (IOUSBInterfaceInterface300** _Nullable)findUVCInterfaceForUSBDevice:(io_service_t)usbDevice {
     IOCFPlugInInterface** plugInInterface = nil;
     SInt32 score;
     kern_return_t kernelResult = IOCreatePlugInInterfaceForService(usbDevice, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plugInInterface, &score);
@@ -487,101 +480,99 @@ typedef enum { ZEDControlReadRequest, ZEDControlWriteRequest } ZEDControlRequest
 }
 
 - (UInt16)brightness {
-    return [self getValueForControl:kUVCBrightness];
+    return [self getValueForControl:UVCBrightness];
 }
 
 - (void)setBrightness:(UInt16)brightness {
-    [self setValue:brightness forControl:kUVCBrightness];
+    [self setValue:brightness forControl:UVCBrightness];
 }
 
 - (void)resetBrightness {
-    [self setValue:self.defaultBrightness forControl:kUVCBrightness];
+    [self setValue:self.defaultBrightness forControl:UVCBrightness];
 }
 
 - (UInt16)contrast {
-    return [self getValueForControl:kUVCContrast];
+    return [self getValueForControl:UVCContrast];
 }
 
 - (void)setContrast:(UInt16)contrast {
-    [self setValue:contrast forControl:kUVCContrast];
+    [self setValue:contrast forControl:UVCContrast];
 }
 
 - (void)resetContrast {
-    [self setValue:self.defaultContrast forControl:kUVCContrast];
+    [self setValue:self.defaultContrast forControl:UVCContrast];
 }
 
 - (UInt16)hue {
-    return [self getValueForControl:kUVCHue];
+    return [self getValueForControl:UVCHue];
 }
 
 - (void)setHue:(UInt16)hue {
-    [self setValue:hue forControl:kUVCHue];
+    [self setValue:hue forControl:UVCHue];
 }
 
 - (void)resetHue {
-    [self setValue:self.defaultHue forControl:kUVCHue];
+    [self setValue:self.defaultHue forControl:UVCHue];
 }
 
 - (UInt16)saturation {
-    return [self getValueForControl:kUVCSaturation];
+    return [self getValueForControl:UVCSaturation];
 }
 
 - (void)setSaturation:(UInt16)saturation {
-    [self setValue:saturation forControl:kUVCSaturation];
+    [self setValue:saturation forControl:UVCSaturation];
 }
 
 - (void)resetSaturation {
-    [self setValue:self.defaultSaturation forControl:kUVCSaturation];
+    [self setValue:self.defaultSaturation forControl:UVCSaturation];
 }
 
 - (UInt16)sharpness {
-    return [self getValueForControl:kUVCSharpness];
+    return [self getValueForControl:UVCSharpness];
 }
 
 - (void)setSharpness:(UInt16)sharpness {
-    [self setValue:sharpness forControl:kUVCSharpness];
+    [self setValue:sharpness forControl:UVCSharpness];
 }
 
 - (void)resetSharpness {
-    [self setValue:self.defaultSharpness forControl:kUVCSharpness];
+    [self setValue:self.defaultSharpness forControl:UVCSharpness];
 }
 
 - (UInt16)whiteBalanceTemperature {
-    return [self getValueForControl:kUVCWhiteBalanceTemperature];
+    return [self getValueForControl:UVCWhiteBalanceTemperature];
 }
 
 - (void)setWhiteBalanceTemperature:(UInt16)whiteBalanceTemperature {
     self.autoWhiteBalanceTemperature = NO;
-    [self setValue:whiteBalanceTemperature forControl:kUVCWhiteBalanceTemperature];
+    [self setValue:whiteBalanceTemperature forControl:UVCWhiteBalanceTemperature];
 }
 
 - (void)resetWhiteBalanceTemperature {
     self.autoWhiteBalanceTemperature = NO;
-    [self setValue:self.defaultWhiteBalanceTemperature forControl:kUVCWhiteBalanceTemperature];
+    [self setValue:self.defaultWhiteBalanceTemperature forControl:UVCWhiteBalanceTemperature];
 }
 
 - (BOOL)autoWhiteBalanceTemperature {
-    return [self getValueForControl:kUVCAutoWhiteBalanceTemperature];
+    return [self getValueForControl:UVCAutoWhiteBalanceTemperature];
 }
 
 - (void)setAutoWhiteBalanceTemperature:(BOOL)autoWhiteBalanceTemperature {
-    [self setValue:autoWhiteBalanceTemperature forControl:kUVCAutoWhiteBalanceTemperature];
+    [self setValue:autoWhiteBalanceTemperature forControl:UVCAutoWhiteBalanceTemperature];
 }
 
 - (void)resetAutoWhiteBalanceTemperature {
-    [self setValue:self.defaultAutoWhiteBalanceTemperature forControl:kUVCAutoWhiteBalanceTemperature];
-}
-
-- (BOOL)isLEDOn {
-    return [self getGPIOValue:ZEDGPIONumberLED];
+    [self setValue:self.defaultAutoWhiteBalanceTemperature forControl:UVCAutoWhiteBalanceTemperature];
 }
 
 - (void)turnOnLED {
-    [self setGPIO:ZEDGPIONumberLED value:1];
+    [self setGPIO:GPIONumberLED direction:GPIODirectionOut];
+    [self setGPIO:GPIONumberLED value:1];
 }
 
 - (void)turnOffLED {
-    [self setGPIO:ZEDGPIONumberLED value:0];
+    [self setGPIO:GPIONumberLED direction:GPIODirectionOut];
+    [self setGPIO:GPIONumberLED value:0];
 }
 
 - (void)toggleLED {
@@ -593,28 +584,73 @@ typedef enum { ZEDControlReadRequest, ZEDControlWriteRequest } ZEDControlRequest
     }
 }
 
+- (BOOL)isLEDOn {
+    [self setGPIO:GPIONumberLED direction:GPIODirectionIn];
+    uint8_t uint8Value = [self getGPIOValue:GPIONumberLED];
+    [self setGPIO:GPIONumberLED direction:GPIODirectionOut];
+
+    return uint8Value != 0;
+}
+
+- (NSString* _Nonnull)deviceID {
+    if (!_deviceID) {
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Attempted to read deviceID on non-open ZedVideoCapture" userInfo:nil];
+    }
+
+    return _deviceID;
+}
+
+- (NSString* _Nonnull)deviceName {
+    if (!_deviceName) {
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Attempted to read deviceName on non-open ZedVideoCapture" userInfo:nil];
+    }
+
+    return _deviceName;
+}
+
+- (NSString* _Nonnull)deviceSerialNumber {
+    if (!_usbDevice) {
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Attempted to read deviceSerialNumber on non-open ZedVideoCapture" userInfo:nil];
+    }
+
+    const int maxSerialNumberLengthInBytes = 6;
+    const int serialNumberStartAddress = 0x18000;
+
+    uint8_t data[maxSerialNumberLengthInBytes] = {0};
+
+    [self getFlashProgramDataAtIndex:serialNumberStartAddress length:maxSerialNumberLengthInBytes output:data];
+
+    if (data[0] != 'O' || data[1] != 'V') {
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to read serial number" userInfo:nil];
+    }
+
+    int intValue = (data[2] << 24) + (data[3] << 16) + (data[4] << 8) + data[5];
+
+    return [NSString stringWithFormat:@"%x", intValue];
+}
+
 #pragma mark - Private
 
 - (UInt16)getValueForControl:(UInt16)control {
     IOReturn result = (*_uvcInterface)->USBInterfaceOpen(_uvcInterface);
 
     if (result != kIOReturnSuccess && result != kIOReturnExclusiveAccess) {
-        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to open USB interface" userInfo:nil];
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to open USB interface for get control value request" userInfo:nil];
     }
 
     UInt16 data = 0;
 
-    IOUSBDevRequest controlRequest = {.bmRequestType = USBmakebmRequestType(UInt8(kUSBIn), UInt8(kUSBClass), UInt8(kUSBInterface)),
-        .bRequest = kUVCGetCurrent,
+    IOUSBDevRequest controlRequest = {.bmRequestType = UVCRequestTypeIn,
+        .bRequest = UVCRequestGetCurrent,
         .wValue = UInt16(control << 8),
-        .wIndex = kUVCUnit << 8,
+        .wIndex = kUVCUnitID << 8,
         .wLength = kUVCControlValueSizeInBytes,
         .pData = &data};
 
     result = (*_uvcInterface)->ControlRequest(_uvcInterface, 0, &controlRequest);
 
     if (result != kIOReturnSuccess) {
-        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to send USB request" userInfo:nil];
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to send UVC get value request" userInfo:nil];
     }
 
     (*_uvcInterface)->USBInterfaceClose(_uvcInterface);
@@ -626,47 +662,67 @@ typedef enum { ZEDControlReadRequest, ZEDControlWriteRequest } ZEDControlRequest
     IOReturn result = (*_uvcInterface)->USBInterfaceOpen(_uvcInterface);
 
     if (result != kIOReturnSuccess && result != kIOReturnExclusiveAccess) {
-        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to open USB interface" userInfo:nil];
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to open USB interface for set control value request" userInfo:nil];
     }
 
-    IOUSBDevRequest controlRequest = {.bmRequestType = USBmakebmRequestType(UInt8(kUSBOut), UInt8(kUSBClass), UInt8(kUSBInterface)),
-        .bRequest = kUVCSetCurrent,
+    IOUSBDevRequest controlRequest = {.bmRequestType = UVCRequestTypeOut,
+        .bRequest = UVCRequestSetCurrent,
         .wValue = UInt16(control << 8),
-        .wIndex = kUVCUnit << 8,
+        .wIndex = kUVCUnitID << 8,
         .wLength = kUVCControlValueSizeInBytes,
         .pData = &value};
 
     result = (*_uvcInterface)->ControlRequest(_uvcInterface, 0, &controlRequest);
 
     if (result != kIOReturnSuccess) {
-        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to send USB request" userInfo:nil];
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to send UVC set value request" userInfo:nil];
     }
 
     (*_uvcInterface)->USBInterfaceClose(_uvcInterface);
 }
 
-- (UInt8)getGPIOValue:(ZEDGPIONumber)gpioNumber {
-    // TODO: This data doesn't seem to matter for the request?
-    //       So right now this only works for the LED gpio.
-
-    UInt8 data[5] = {0x51, 0x13, gpioNumber};
-    [self sendDeviceControlRequest:ZEDControlReadRequest data:data length:sizeof(data)];
-
-    return data[4];
+- (void)setGPIO:(GPIONumber)gpioNumber direction:(GPIODirection)direction {
+    UInt8 data[kXUBufferSizeInBytes] = {0x50, 0x10, gpioNumber, direction};
+    [self sendXURequest:XUWriteRequest data:data];
 }
 
-- (void)setGPIO:(ZEDGPIONumber)gpioNumber value:(UInt8)value {
-    UInt8 data[4] = {0x50, 0x12, gpioNumber, value};
-    [self sendDeviceControlRequest:ZEDControlWriteRequest data:data length:sizeof(data)];
+- (void)setGPIO:(GPIONumber)gpioNumber value:(UInt8)value {
+    UInt8 data[kXUBufferSizeInBytes] = {0x50, 0x12, gpioNumber, value};
+    [self sendXURequest:XUWriteRequest data:data];
 }
 
-- (void)sendDeviceControlRequest:(ZEDControlRequest)controlRequest data:(UInt8*)data length:(UInt16)length {
+- (UInt8)getGPIOValue:(GPIONumber)gpioNumber {
+    UInt8 data[kXUBufferSizeInBytes] = {0x51, 0x13, gpioNumber};
+    [self sendXURequest:XUReadRequest data:data];
+
+    return data[17];
+}
+
+- (void)getFlashProgramDataAtIndex:(int)index length:(int)length output:(UInt8*)output {
+    uint8_t data[kXUBufferSizeInBytes] = {0x51, 0xa1, 0x03};
+    data[5] = (index >> 24) & 0xff;
+    data[6] = (index >> 16) & 0xff;
+    data[7] = (index >> 8) & 0xff;
+    data[8] = index & 0xff;
+
+    int packVal = 36864 + length;
+    data[9] = (packVal >> 8) & 0xff;
+    data[10] = packVal & 0xff;
+    data[11] = (length >> 8) & 0xff;
+    data[12] = length & 0xff;
+
+    [self sendXURequest:XUReadRequest data:data];
+
+    memcpy(output, &data[17], length);
+}
+
+- (void)sendXURequest:(XURequest)xuRequest data:(UInt8*)data {
     IOCFPlugInInterface** plugInInterface = nil;
     SInt32 score;
     kern_return_t kernelResult = IOCreatePlugInInterfaceForService(_usbDevice, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plugInInterface, &score);
 
     if ((kernelResult != kIOReturnSuccess) || !plugInInterface) {
-        return;
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to create USB plugin interface for extension unit request" userInfo:nil];
     }
 
     IOUSBDeviceInterface300** deviceInterface = nil;
@@ -674,27 +730,41 @@ typedef enum { ZEDControlReadRequest, ZEDControlWriteRequest } ZEDControlRequest
     IODestroyPlugInInterface(plugInInterface);
 
     if ((ioResult != 0) || !deviceInterface) {
-        return;
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to find USB interface for extension unit request" userInfo:nil];
     }
 
     IOReturn result = (*deviceInterface)->USBDeviceOpen(deviceInterface);
 
     if (result != kIOReturnSuccess && result != kIOReturnExclusiveAccess) {
-        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to open USB interface" userInfo:nil];
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to open USB interface for extension unit request" userInfo:nil];
     }
 
-    IOUSBDevRequest request
-        = {.bmRequestType = UInt8(USBmakebmRequestType(UInt8(controlRequest == ZEDControlReadRequest ? kUSBIn : kUSBOut), UInt8(kUSBClass), UInt8(kUSBDevice))),
-            .bRequest = UInt8(controlRequest == ZEDControlReadRequest ? kUVCGetCurrent : kUVCSetCurrent),
-            .wValue = kZEDControl << 8,
-            .wIndex = kZEDUnit << 8,
-            .wLength = length,
-            .pData = data};
+    IOUSBDevRequest setTaskRequest = {.bmRequestType = XURequestTypeOut,
+        .bRequest = UVCRequestSetCurrent,
+        .wValue = kXUControlSelector << 8,
+        .wIndex = kXUID << 8,
+        .wLength = kXUBufferSizeInBytes,
+        .pData = data};
 
-    result = (*deviceInterface)->DeviceRequest(deviceInterface, &request);
+    result = (*deviceInterface)->DeviceRequest(deviceInterface, &setTaskRequest);
 
     if (result != kIOReturnSuccess) {
-        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to send USB request" userInfo:nil];
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to send extension unit set task request" userInfo:nil];
+    }
+
+    if (xuRequest == XUReadRequest) {
+        IOUSBDevRequest getDataRequest = {.bmRequestType = XURequestTypeIn,
+            .bRequest = UVCRequestGetCurrent,
+            .wValue = kXUControlSelector << 8,
+            .wIndex = kXUID << 8,
+            .wLength = kXUBufferSizeInBytes,
+            .pData = data};
+
+        result = (*deviceInterface)->DeviceRequest(deviceInterface, &getDataRequest);
+
+        if (result != kIOReturnSuccess) {
+            @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Failed to send extension unit get data request" userInfo:nil];
+        }
     }
 
     (*deviceInterface)->USBDeviceClose(deviceInterface);
@@ -724,77 +794,14 @@ typedef enum { ZEDControlReadRequest, ZEDControlWriteRequest } ZEDControlRequest
         free(_destinationImageBuffer.data);
         _destinationImageBuffer.data = nil;
     }
+
+    _deviceID = nil;
+    _deviceName = nil;
 }
 
 - (void)dealloc {
     [self reset];
     [super dealloc];
-}
-
-#pragma mark - Utilities
-
-- (void)logCMTime:(CMTime)time {
-    int value = time.value;
-    int timescale = time.timescale;
-
-    int frameRate = floor(float(timescale) / float(value));
-    int frameDuration = floor(1.0 / float(frameRate) * 1000.0);
-
-    NSLog(@"FPS: %d (%d ms)", frameRate, frameDuration);
-}
-
-void queryUSBInterfaces(io_service_t device) {
-    IOCFPlugInInterface** plugInInterface = nil;
-    SInt32 score;
-    kern_return_t kernelResult = IOCreatePlugInInterfaceForService(device, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plugInInterface, &score);
-
-    if ((kernelResult != kIOReturnSuccess) || !plugInInterface) {
-        NSLog(@"Failed to create plugin");
-        return;
-    }
-
-    IOUSBDeviceInterface** deviceInterface = nil;
-    IOReturn ioResult = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID), (LPVOID*)&deviceInterface);
-    IODestroyPlugInInterface(plugInInterface);
-
-    if ((ioResult != 0) || !deviceInterface) {
-        NSLog(@"Failed to create device interface");
-        return;
-    }
-
-    io_iterator_t interfaceIterator;
-    IOUSBFindInterfaceRequest interfaceRequest = {.bInterfaceClass = kIOUSBFindInterfaceDontCare,
-        .bInterfaceSubClass = kIOUSBFindInterfaceDontCare,
-        .bInterfaceProtocol = kIOUSBFindInterfaceDontCare,
-        .bAlternateSetting = kIOUSBFindInterfaceDontCare};
-
-    ioResult = (*deviceInterface)->CreateInterfaceIterator(deviceInterface, &interfaceRequest, &interfaceIterator);
-    (*deviceInterface)->Release(deviceInterface);
-
-    if ((ioResult != 0) || !interfaceIterator) {
-        NSLog(@"Failed to create iterator");
-        return;
-    }
-
-    io_service_t usbInterface;
-    while ((usbInterface = IOIteratorNext(interfaceIterator))) {
-        printServiceInfo(device);
-        IOObjectRelease(usbInterface);
-    }
-
-    IOObjectRelease(interfaceIterator);
-}
-
-void printServiceInfo(io_service_t service) {
-    CFMutableDictionaryRef properties = nil;
-    IOReturn result = IORegistryEntryCreateCFProperties(service, &properties, kCFAllocatorDefault, 0);
-    if (result == kIOReturnSuccess && properties) {
-        CFShow(properties);
-        CFRelease(properties);
-    }
-    else {
-        NSLog(@"Failed to retrieve properties for this service.");
-    }
 }
 
 @end

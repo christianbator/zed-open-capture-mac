@@ -106,8 +106,7 @@ int main() {
     StereoDimensions stereoDimensions = videoCapture.open<HD720, FPS_30>(BGR);
 
     // Load calibration data
-    CalibrationData calibrationData;
-    calibrationData.load("37970291");
+    CalibrationData calibrationData = videoCapture.getCalibrationData();
 
     // Initialize calibration matrices
     Mat mapLeftX, mapLeftY;
