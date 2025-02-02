@@ -20,7 +20,7 @@
 - Open source C++20 capture library
 - Video data capture
     - [x] YUV 4:2:2 (native camera format)
-    - [x] Greyscale (hardware-accelerated conversion)
+    - [x] Greyscale
     - [x] RGB (hardware-accelerated conversion)
     - [x] BGR (hardware-accelerated conversion)
 - Resolution control
@@ -28,6 +28,11 @@
     - [x] HD1080: 1920 x 1080 (15, 30 fps)
     - [x] HD720: 1280 x 720 (15, 30, 60 fps)
     - [x] VGA: 672 x 376 (15, 30, 60, 100 fps)
+- Camera info
+    - [x] Name
+    - [x] Unique connection ID
+    - [x] Serial number
+    - [x] Calibration data
 - Camera control
     - [x] LED on / off
     - [x] Brightness
@@ -45,8 +50,6 @@
     - [ ] 3-DOF Magnetometer (ZED 2 & ZED 2i)
     - [ ] Barometer (ZED 2 & ZED 2i)
     - [ ] Temperature (ZED 2 & ZED 2i)
-- Calibration & synchronization
-    - [x] Camera calibration
     - [ ] Video and sensor data synchronization
 
 ### Description
