@@ -39,7 +39,7 @@ endforeach()
 # Dependencies
 #
 set(ZEDOpenCaptureMac_INCLUDE_DIR /opt/stereolabs/include)
-find_library(ZEDOpenCaptureMac_LIB NAMES ZEDOpenCaptureMac PATHS /opt/stereolabs/lib)
+find_library(ZEDOpenCaptureMac_LIB NAMES zed-open-capture-mac PATHS /opt/stereolabs/lib)
 find_package(OpenCV REQUIRED)
 
 foreach(TARGET ${TARGET_NAMES})

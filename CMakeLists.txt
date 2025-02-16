@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.31)
 #
 # Project Info
 #
-set(PROJECT_NAME "ZEDOpenCaptureMac")
+set(PROJECT_NAME "zed-open-capture-mac")
 project(${PROJECT_NAME} LANGUAGES CXX OBJC)
 
 #
