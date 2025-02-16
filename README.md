@@ -108,7 +108,7 @@ cd zed-open-capture-mac
 
 ```zsh
 cmake -B build
-cmake --build build --config Release
+cmake --build build --parallel
 sudo cmake --install build
 ```
 
@@ -225,7 +225,7 @@ Make sure you've built and installed the library with:
 
 ```zsh
 cmake -B build
-cmake --build build --config Release
+cmake --build build --parallel
 sudo cmake --install build
 ```
 
@@ -234,7 +234,7 @@ Then you can build the examples with:
 ```zsh
 cd examples
 cmake -B build
-cmake --build build
+cmake --build build --parallel
 ```
 
 The following examples are built:
