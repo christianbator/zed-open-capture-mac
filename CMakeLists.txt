@@ -19,6 +19,7 @@ project(${PROJECT_NAME} LANGUAGES CXX OBJC)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+add_compile_options(-fobjc-arc)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-g)

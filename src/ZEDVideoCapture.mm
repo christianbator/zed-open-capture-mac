@@ -81,7 +81,7 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 #pragma mark - Public Interface
 
 - (_Nonnull instancetype)init {
-    [super init];
+    self = [super init];
 
     _defaultBrightness = 4;
     _defaultContrast = 4;
@@ -416,18 +416,24 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
     size_t height = CVPixelBufferGetHeight(pixelBuffer);
     size_t width = CVPixelBufferGetWidth(pixelBuffer);
 
+    __weak ZEDVideoCapture* weakSelf = self;
+
     if (_colorSpace == zed::YUV) {
         uint8_t* yuvData = (uint8_t*)CVPixelBufferGetBaseAddress(pixelBuffer);
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            _frameProcessingBlock(yuvData, height, width, 2);
+            if (weakSelf && weakSelf.frameProcessingBlock) {
+                weakSelf.frameProcessingBlock(yuvData, height, width, 2);
+            }
         });
     }
     else if (_colorSpace == zed::GREYSCALE) {
         uint8_t* greyscaleData = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0);
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            _frameProcessingBlock(greyscaleData, height, width, 1);
+            if (weakSelf && weakSelf.frameProcessingBlock) {
+                weakSelf.frameProcessingBlock(greyscaleData, height, width, 1);
+            }
         });
     }
     else if (_colorSpace == zed::RGB) {
@@ -442,7 +448,9 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
         uint8_t* rgbData = (uint8_t*)_destinationImageBuffer.data;
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            _frameProcessingBlock(rgbData, height, width, 3);
+            if (weakSelf && weakSelf.frameProcessingBlock) {
+                weakSelf.frameProcessingBlock(rgbData, height, width, 3);
+            }
         });
     }
     else if (_colorSpace == zed::BGR) {
@@ -457,7 +465,9 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
         uint8_t* bgrData = (uint8_t*)_destinationImageBuffer.data;
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            _frameProcessingBlock(bgrData, height, width, 3);
+            if (weakSelf && weakSelf.frameProcessingBlock) {
+                weakSelf.frameProcessingBlock(bgrData, height, width, 3);
+            }
         });
     }
 
@@ -797,11 +807,6 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 
     _deviceID = nil;
     _deviceName = nil;
-}
-
-- (void)dealloc {
-    [self reset];
-    [super dealloc];
 }
 
 @end

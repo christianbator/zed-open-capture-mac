@@ -26,9 +26,7 @@ namespace zed {
     }
 
     VideoCapture::~VideoCapture() {
-        if (impl) {
-            delete impl;
-        }
+        delete impl;
     }
 
     string VideoCapture::getDeviceID() {
