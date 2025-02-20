@@ -5,7 +5,6 @@
 // Created by Christian Bator on 02/02/2025
 //
 
-#include <iostream>
 #include <cassert>
 #include "../include/zed_video_capture.h"
 
