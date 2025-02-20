@@ -53,7 +53,7 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 //
 // Parameters
 //
-#define kMaxFrameBacklog 3
+#define kMaxFrameBacklog 15
 
 //
 // ZEDVideoCapture
