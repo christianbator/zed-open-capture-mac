@@ -73,6 +73,7 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 
 @property (nonatomic, assign) vImage_Buffer sourceImageBuffer;
 @property (nonatomic, assign) vImage_Buffer destinationImageBuffer;
+@property (nonatomic, strong, nonnull) NSLock *destinationImageBufferLock;
 
 @end
 
@@ -92,6 +93,7 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
     _defaultAutoWhiteBalanceTemperature = YES;
 
     _queue = dispatch_queue_create("co.bator.zed-video-capture-mac", DISPATCH_QUEUE_SERIAL);
+    _destinationImageBufferLock = [[NSLock alloc] init];
 
     return self;
 }
@@ -409,37 +411,47 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
         return;
     }
 
-    CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    __weak typeof(self) weakSelf = self;
 
+    CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
 
     size_t height = CVPixelBufferGetHeight(pixelBuffer);
     size_t width = CVPixelBufferGetWidth(pixelBuffer);
 
-    __weak ZEDVideoCapture* weakSelf = self;
-
     if (_colorSpace == zed::YUV) {
+        CFRetain(pixelBuffer);
         uint8_t* yuvData = (uint8_t*)CVPixelBufferGetBaseAddress(pixelBuffer);
 
         dispatch_async(dispatch_get_main_queue(), ^{
             if (weakSelf && weakSelf.frameProcessingBlock) {
                 weakSelf.frameProcessingBlock(yuvData, height, width, 2);
             }
+
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
+            CFRelease(pixelBuffer);
         });
     }
     else if (_colorSpace == zed::GREYSCALE) {
+        CFRetain(pixelBuffer);
         uint8_t* greyscaleData = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0);
-
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             if (weakSelf && weakSelf.frameProcessingBlock) {
                 weakSelf.frameProcessingBlock(greyscaleData, height, width, 1);
             }
+
+            CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
+            CFRelease(pixelBuffer);
         });
     }
     else if (_colorSpace == zed::RGB) {
         _sourceImageBuffer.data = (uint8_t*)CVPixelBufferGetBaseAddress(pixelBuffer);
 
+        [_destinationImageBufferLock lock];
         vImage_Error conversionError = vImageConvert_ARGB8888toRGB888(&_sourceImageBuffer, &_destinationImageBuffer, kvImageNoFlags);
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
+        [_destinationImageBufferLock unlock];
 
         if (conversionError < 0) {
             @throw [NSException exceptionWithName:@"ZEDVideoCaptureRuntimeError" reason:@"Failed to convert video frame to RGB color space" userInfo:nil];
@@ -449,14 +461,19 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 
         dispatch_async(dispatch_get_main_queue(), ^{
             if (weakSelf && weakSelf.frameProcessingBlock) {
+                [weakSelf.destinationImageBufferLock lock];
                 weakSelf.frameProcessingBlock(rgbData, height, width, 3);
+                [weakSelf.destinationImageBufferLock unlock];
             }
         });
     }
     else if (_colorSpace == zed::BGR) {
         _sourceImageBuffer.data = (uint8_t*)CVPixelBufferGetBaseAddress(pixelBuffer);
 
+        [_destinationImageBufferLock lock];
         vImage_Error conversionError = vImageConvert_BGRA8888toBGR888(&_sourceImageBuffer, &_destinationImageBuffer, kvImageNoFlags);
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
+        [_destinationImageBufferLock unlock];
 
         if (conversionError < 0) {
             @throw [NSException exceptionWithName:@"ZEDVideoCaptureRuntimeError" reason:@"Failed to convert video frame to BGR color space" userInfo:nil];
@@ -466,12 +483,12 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 
         dispatch_async(dispatch_get_main_queue(), ^{
             if (weakSelf && weakSelf.frameProcessingBlock) {
+                [weakSelf.destinationImageBufferLock lock];
                 weakSelf.frameProcessingBlock(bgrData, height, width, 3);
+                [weakSelf.destinationImageBufferLock unlock];
             }
         });
     }
-
-    CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
 }
 
 - (void)stop {
@@ -482,11 +499,6 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
     }
 
     _frameProcessingBlock = nil;
-
-    if (_destinationImageBuffer.data) {
-        free(_destinationImageBuffer.data);
-        _destinationImageBuffer.data = nil;
-    }
 }
 
 - (UInt16)brightness {
@@ -807,6 +819,10 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 
     _deviceID = nil;
     _deviceName = nil;
+}
+
+- (void)dealloc {
+    [self reset];
 }
 
 @end
