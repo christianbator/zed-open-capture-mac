@@ -472,7 +472,7 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 
     _frameBacklogCount++;
 
-    __weak typeof(self) weakSelf = self;
+    __weak ZEDVideoCapture* weakSelf = self;
 
     CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
