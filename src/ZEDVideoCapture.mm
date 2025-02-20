@@ -51,6 +51,11 @@ typedef NS_ENUM(UInt8, GPIONumber) { GPIONumberLED = 2 };
 typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 1 };
 
 //
+// Parameters
+//
+#define kMaxFrameBacklog 3
+
+//
 // ZEDVideoCapture
 //
 @interface ZEDVideoCapture () <AVCaptureVideoDataOutputSampleBufferDelegate>
@@ -66,7 +71,8 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 @property (nonatomic, assign) CMTime desiredFrameDuration;
 @property (nonatomic, strong, nullable) void (^frameProcessingBlock)(uint8_t* data, size_t height, size_t width, size_t channels);
 
-@property (nonatomic, strong) dispatch_queue_t queue;
+@property (nonatomic, strong, nonnull) dispatch_queue_t frameProcessingQueue;
+@property (nonatomic, assign) int frameBacklogCount;
 
 @property (nonatomic, assign) io_service_t usbDevice;
 @property (nonatomic, assign) IOUSBInterfaceInterface300** uvcInterface;
@@ -74,6 +80,9 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 @property (nonatomic, assign) vImage_Buffer sourceImageBuffer;
 @property (nonatomic, assign) vImage_Buffer destinationImageBuffer;
 @property (nonatomic, strong, nonnull) NSLock *destinationImageBufferLock;
+
+@property (nonatomic, assign) BOOL isOpen;
+@property (nonatomic, assign) BOOL isRunning;
 
 @end
 
@@ -92,8 +101,12 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
     _defaultWhiteBalanceTemperature = 4600;
     _defaultAutoWhiteBalanceTemperature = YES;
 
-    _queue = dispatch_queue_create("co.bator.zed-video-capture-mac", DISPATCH_QUEUE_SERIAL);
+    _frameProcessingQueue = dispatch_queue_create("co.bator.zed-video-capture-mac", DISPATCH_QUEUE_SERIAL);
+    _frameBacklogCount = 0;
     _destinationImageBufferLock = [[NSLock alloc] init];
+
+    _isOpen = NO;
+    _isRunning = NO;
 
     return self;
 }
@@ -102,7 +115,9 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
     //
     // Initialization
     //
-    [self reset];
+    if (_isOpen) {
+        @throw [NSException exceptionWithName:@"ZEDCameraRuntimeError" reason:@"Attempted to open an already open ZEDVideoCapture instance" userInfo:nil];
+    }
 
     AVCaptureSession* session = [[AVCaptureSession alloc] init];
     [session beginConfiguration];
@@ -238,7 +253,7 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
     }
 
     output.videoSettings = outputVideoSettings;
-    [output setSampleBufferDelegate:self queue:_queue];
+    [output setSampleBufferDelegate:self queue:_frameProcessingQueue];
 
     //
     // Finalization
@@ -267,6 +282,8 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
         _stereoDimensions.toString().c_str(),
         _frameRate,
         zed::colorSpaceToString(_colorSpace).c_str());
+
+    _isOpen = YES;
 
     return YES;
 }
@@ -380,23 +397,58 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
 
 - (void)close {
     [self stop];
-    [self reset];
+
+    if (_isOpen) {
+        _frameProcessingBlock = nil;
+        _desiredFrameDuration = kCMTimeInvalid;
+        _desiredFormat = nil;
+        _device = nil;
+        _session = nil;
+
+        if (_uvcInterface) {
+            (*_uvcInterface)->Release(_uvcInterface);
+        }
+
+        _uvcInterface = nil;
+
+        if (_usbDevice) {
+            IOObjectRelease(_usbDevice);
+        }
+
+        _usbDevice = 0;
+
+        if (_destinationImageBuffer.data) {
+            free(_destinationImageBuffer.data);
+            _destinationImageBuffer.data = nil;
+        }
+
+        _deviceID = nil;
+        _deviceName = nil;
+
+        _isOpen = NO;
+    }
 }
 
 - (void)start:(void (^)(uint8_t*, size_t, size_t, size_t))frameProcessingBlock {
-    if (!_session) {
+    if (!_isOpen) {
         @throw [NSException exceptionWithName:@"ZEDVideoCaptureRuntimeError"
                                        reason:@"Attempted to start an unopened ZEDVideoCapture, "
                                               @"call `open()` before `start()`"
                                      userInfo:nil];
     }
 
+    if (_isRunning) {
+        @throw [NSException exceptionWithName:@"ZEDVideoCaptureRuntimeError"
+                                       reason:@"Attempted to start an already running ZEDVideoCapture"
+                                     userInfo:nil];
+    }
+
     _frameProcessingBlock = [frameProcessingBlock copy];
 
+    NSAssert(_session != nil, @"Unexpectedly found nil session in `start()`");
     [_session startRunning];
 
     NSAssert(_device != nil, @"Unexpectedly found nil device in `start()`");
-
     [_device lockForConfiguration:nil];
     _device.activeFormat = _desiredFormat;
     _device.activeVideoMinFrameDuration = _desiredFrameDuration;
@@ -404,12 +456,21 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
     [_device unlockForConfiguration];
 
     [self turnOnLED];
+
+    _isRunning = YES;
 }
 
 - (void)captureOutput:(AVCaptureOutput*)output didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection*)connection {
     if (!_frameProcessingBlock) {
         return;
     }
+
+    if (_frameBacklogCount > kMaxFrameBacklog) {
+        NSLog(@"Warning: dropped frame (backlog of %d frames)", _frameBacklogCount);
+        return;
+    }
+
+    _frameBacklogCount++;
 
     __weak typeof(self) weakSelf = self;
 
@@ -426,6 +487,12 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
         dispatch_async(dispatch_get_main_queue(), ^{
             if (weakSelf && weakSelf.frameProcessingBlock) {
                 weakSelf.frameProcessingBlock(yuvData, height, width, 2);
+                
+                dispatch_async(weakSelf.frameProcessingQueue, ^{
+                    if (weakSelf) {
+                        weakSelf.frameBacklogCount--;
+                    }
+                });
             }
 
             CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
@@ -439,6 +506,12 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
         dispatch_async(dispatch_get_main_queue(), ^{
             if (weakSelf && weakSelf.frameProcessingBlock) {
                 weakSelf.frameProcessingBlock(greyscaleData, height, width, 1);
+                
+                dispatch_async(weakSelf.frameProcessingQueue, ^{
+                    if (weakSelf) {
+                        weakSelf.frameBacklogCount--;
+                    }
+                });
             }
 
             CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
@@ -464,6 +537,12 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
                 [weakSelf.destinationImageBufferLock lock];
                 weakSelf.frameProcessingBlock(rgbData, height, width, 3);
                 [weakSelf.destinationImageBufferLock unlock];
+
+                dispatch_async(weakSelf.frameProcessingQueue, ^{
+                    if (weakSelf) {
+                        weakSelf.frameBacklogCount--;
+                    }
+                });
             }
         });
     }
@@ -486,19 +565,29 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
                 [weakSelf.destinationImageBufferLock lock];
                 weakSelf.frameProcessingBlock(bgrData, height, width, 3);
                 [weakSelf.destinationImageBufferLock unlock];
+                
+                dispatch_async(weakSelf.frameProcessingQueue, ^{
+                    if (weakSelf) {
+                        weakSelf.frameBacklogCount--;
+                    }
+                });
             }
         });
     }
 }
 
 - (void)stop {
-    [self turnOffLED];
+    if (_isRunning) {
+        [self turnOffLED];
 
-    if (_session) {
-        [_session stopRunning];
+        if (_session) {
+            [_session stopRunning];
+        }
+
+        _frameProcessingBlock = nil;
+
+        _isRunning = NO;
     }
-
-    _frameProcessingBlock = nil;
 }
 
 - (UInt16)brightness {
@@ -793,36 +882,11 @@ typedef NS_ENUM(UInt8, GPIODirection) { GPIODirectionOut = 0, GPIODirectionIn = 
     (*deviceInterface)->Release(deviceInterface);
 }
 
-- (void)reset {
-    _frameProcessingBlock = nil;
-    _desiredFrameDuration = kCMTimeInvalid;
-    _desiredFormat = nil;
-    _device = nil;
-    _session = nil;
-
-    if (_uvcInterface) {
-        (*_uvcInterface)->Release(_uvcInterface);
-    }
-
-    _uvcInterface = nil;
-
-    if (_usbDevice) {
-        IOObjectRelease(_usbDevice);
-    }
-
-    _usbDevice = 0;
-
-    if (_destinationImageBuffer.data) {
-        free(_destinationImageBuffer.data);
-        _destinationImageBuffer.data = nil;
-    }
-
-    _deviceID = nil;
-    _deviceName = nil;
-}
-
 - (void)dealloc {
-    [self reset];
+    if (_isOpen) {
+        NSLog(@"Warning: missing call to -[ZEDVideoCapture close] before -[ZEDVideoCapture dealloc]");
+        [self close];
+    }
 }
 
 @end
