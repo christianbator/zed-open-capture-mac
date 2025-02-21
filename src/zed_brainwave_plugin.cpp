@@ -20,20 +20,20 @@ void reset() {
 
 extern "C" {
     __attribute__((visibility("default")))
-    void open(StereoDimensions* stereoDimensions) {
+    void open(ColorSpace colorSpace, StereoDimensions* stereoDimensions) {
         assert(videoCapture == nullptr);
 
         videoCapture = new VideoCapture();
-        *stereoDimensions = videoCapture->open<HD720, FPS_60>(RGB);
+        *stereoDimensions = videoCapture->open<HD720, FPS_60>(colorSpace);
     }
 
     __attribute__((visibility("default")))
     void start(uint8_t* frameBuffer, int* isNextFrameAvailable) {
         assert(videoCapture != nullptr);
-
+        
         videoCapture->start([frameBuffer, isNextFrameAvailable](uint8_t* data, size_t height, size_t width, size_t channels) {
             memcpy(frameBuffer, data, height * width * channels);
-            *isNextFrameAvailable = true;
+            *isNextFrameAvailable = 1;
         });
     }
 
