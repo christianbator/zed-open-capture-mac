@@ -17,7 +17,6 @@
 
 ## Features
 
-- Open source C++20 capture library
 - Video data capture
     - [x] YUV 4:2:2 (native camera format)
     - [x] Greyscale
