@@ -55,7 +55,7 @@
 
 The ZED Open Capture library is a macOS library for low-level camera and sensor capture for the ZED stereo camera family.
 
-The library provides methods to access raw video frames, calibration data, camera controls, and raw data from the USB3 camera sensors. A synchronization mechanism is provided to associate the correct sensor data with a particular video frame.
+The library provides methods to access raw video frames, calibration data, camera controls, and raw data from the USB 3 camera sensors. A synchronization mechanism is provided to associate the correct sensor data with a particular video frame.
 
 **Note:** The ZED SDK calibrates all output data, but here you're dealing with raw data. See <a href="#calibration">calibration</a> below for details about downloading and applying the calibration parameters to correct the camera data.
 
@@ -63,7 +63,7 @@ The library provides methods to access raw video frames, calibration data, camer
 
 ### Prerequisites
 
- * Stereolabs USB3 Stereo camera: [ZED 2i](https://www.stereolabs.com/zed-2i/), [ZED 2](https://www.stereolabs.com/zed-2/), [ZED Mini](https://www.stereolabs.com/zed-mini/)
+ * Stereolabs USB 3 Stereo camera: [ZED 2i](https://www.stereolabs.com/zed-2i/), [ZED 2](https://www.stereolabs.com/zed-2/), [ZED Mini](https://www.stereolabs.com/zed-mini/)
  * macOS (>= 15)
  * Clang (>= 19) (Xcode or Homebrew)
  * CMake (>= 3.31)
